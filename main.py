@@ -1,8 +1,13 @@
 import abs
 
 
+from bookshelf import Bookshelf
+
+
 def main():
-    window = abs.ABS()
+    bookshelf = Bookshelf()
+    bookshelf.load()
+    window = abs.ABS(bookshelf)
 
 
 if __name__ == "__main__":

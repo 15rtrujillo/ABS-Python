@@ -1,13 +1,30 @@
 import tkinter as tk
+
+
+from bookshelf import Bookshelf
 from tkinter import ttk
 
 
 class ABS:
-    def __init__(self):
+    def __init__(self, bookshelf: Bookshelf):
+        self.bookshelf = bookshelf
+
         self.root = tk.Tk()
         self.root.title("Aurora's Bookshelf")
 
-        # Menu bar
+        self.__create_menu_bar()
+        
+        self.__create_booklist_frame()
+
+        # Vertical separator
+        self.separator = ttk.Separator(self.root, orient="vertical")
+        self.separator.grid(row=0, column=1)
+
+        self.__create_books_frame()
+
+        self.root.mainloop()
+
+    def __create_menu_bar(self):                # Menu bar
         self.menu_bar = tk.Menu(self.root)
 
         # File menu
@@ -26,8 +43,8 @@ class ABS:
         self.menu_bar.add_cascade(label="Help", menu=self.help_menu)
 
         self.root.config(menu=self.menu_bar)
-        
-        # Booklist frame
+
+    def __create_booklist_frame(self):
         self.frame_booklists = tk.Frame(self.root)
         self.frame_booklists.grid(row=0, column=0)
 
@@ -46,12 +63,8 @@ class ABS:
         self.button_rename_booklist.grid(row=0, column=1)
         self.button_delete_booklist = tk.Button(self.frame_booklist_buttons, text="Delete Booklist")
         self.button_delete_booklist.grid(row=0, column=2)
-
-        # Vertical separator
-        self.separator = ttk.Separator(self.root, orient="vertical")
-        self.separator.grid(row=0, column=1)
-
-        # Books frame
+    
+    def __create_books_frame(self):
         self.frame_books = tk.Frame(self.root)
         self.frame_books.grid(row=0, column=2)
 
@@ -88,5 +101,3 @@ class ABS:
         self.button_edit_book.grid(row=0, column=1)
         self.button_delete_book = tk.Button(self.frame_books_buttons, text="Delete Book")
         self.button_delete_book.grid(row=0, column=2)
-
-        self.root.mainloop()

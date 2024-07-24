@@ -1,6 +1,5 @@
-# EpicQuest files
-*.eq
-*.log
+*.abs
+*.list
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

@@ -1,0 +1,85 @@
+import file_utils
+import json
+
+
+from book import Book
+from booklist import Booklist
+
+
+class Bookshelf:
+    def __init__(self):
+        self.books: dict[int, Book] = {}
+        self.booklists: dict[str, Booklist] = {}
+        self.max_book_id: int = 0
+        self.custom_properties: list[str] = []
+
+    def __load_books(self):        
+        # Read in the books
+        try:
+            bookshelf_file = open(file_utils.get_file_path("Data/Bookshelf.abs"), "r")
+        except FileNotFoundError:
+            print("Bookshelf.abs file does not exist")
+            return
+        
+        try:
+            bookshelf_json = json.loads(bookshelf_file.read())
+        except json.JSONDecodeError:
+            print("Error decoding Bookshelf JSON")
+            return
+        
+        for book in bookshelf_json:
+            id = book["id"]
+            if id > self.max_book_id:
+                self.max_book_id = id
+
+            custom_properties = book["custom_properties"].keys()
+            if not self.custom_properties:
+                self.custom_properties = custom_properties
+            elif self.custom_properties != custom_properties:
+                print("Custom properties mismatch!")
+                exit()
+
+            new_book = Book(
+                id,
+                book["title"],
+                book["author"],
+                book["publication_year"],
+                *custom_properties
+            )
+            new_book.define_custom_property(**book["custom_properties"])
+
+            self.books[id] = new_book
+
+    def __load_booklists(self):
+        file_names = file_utils.get_files_in_directory(file_utils.get_data_directory())
+        for file_name in file_names:
+            if file_name[file_name.find(".")+1:] != "list":
+                continue
+
+            try:
+                list_file = open(file_utils.get_file_path("Data/" + file_name), "r")
+            except FileNotFoundError:
+                print("File not found for some reason:", file_name)
+                continue
+
+            try:
+                list_json = json.loads(list_file.read())
+            except json.JSONDecodeError:
+                print("Couldn't parse JSON for booklist", file_name)
+                continue
+
+            new_booklist = Booklist(list_json["name"], *list_json["books"])
+
+            self.booklists[list_json["name"]] = new_booklist
+
+    def load(self):
+        # Check if the data directory exists. If it doesn't, we create it
+        if not file_utils.data_directory_exists():
+            print("Data directory does not exist. Creating...")
+            file_utils.create_data_directory()
+            return
+        
+        self.__load_books()
+
+        self.__load_booklists()
+        
