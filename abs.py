@@ -38,7 +38,7 @@ class ABS:
         # Setup the treeview columns and the search filters
         self.update_properties()
 
-        self.root.mainloop()
+        self.repopulate_books()
 
     def __create_menu_bar(self):
         self.menu_bar = tk.Menu(self.root)
@@ -169,8 +169,15 @@ class ABS:
 
     def repopulate_bookslists(self):
         for booklist in self.bookshelf.booklists.keys():
-            self.listbox_booklists.insert(tk.END, booklist)
+            self.listbox_booklists.insert(tk.END, booklist + f" ({len(self.bookshelf.booklists[booklist].books)} books)")
 
+    def repopulate_books(self):
+        for book_id in self.selected_booklist.books:
+            book = self.bookshelf.books[book_id]
+            self.treeview_books.insert("", "end",
+                                       text=book.title,
+                                       values=([book.title, book.author, book.publication_year] + [*book.custom_properties.values()]))
+    
     def reconfigure_treeview_columns(self, columns: list[str]):
         self.treeview_books.configure(columns=columns)
         for column in columns:
@@ -187,4 +194,7 @@ class ABS:
         all_properties = self.bookshelf.built_in_properties + self.bookshelf.custom_properties
         self.reconfigure_treeview_columns(all_properties)
         self.reconfigure_filters(all_properties)
+
+    def show_window(self):
+        self.root.mainloop()
         

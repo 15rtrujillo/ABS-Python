@@ -69,8 +69,8 @@ class Bookshelf:
                 print("Couldn't parse JSON for booklist", file_name)
                 continue
 
-            new_booklist = Booklist(list_json["name"], *list_json["books"])
-
+            new_booklist = Booklist(list_json["name"], True, *list_json["books"])
+ 
             self.booklists[list_json["name"]] = new_booklist
 
     def load(self):
