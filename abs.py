@@ -17,9 +17,11 @@ class ABS:
 
         self.__create_menu_bar()
         
-        self.root.columnconfigure(0, weight=2)
-        self.root.columnconfigure(1, weight=1)
-        self.root.columnconfigure(2, weight=3)
+        self.root.rowconfigure(0, weight=1)
+        self.root.columnconfigure(0, weight=22)
+        self.root.columnconfigure(1, weight=5)
+        self.root.columnconfigure(2, weight=73)
+
         self.__create_booklist_frame()
 
         # Vertical separator
@@ -60,40 +62,61 @@ class ABS:
 
     def __create_booklist_frame(self):
         self.frame_booklists = tk.Frame(self.root)
-        self.frame_booklists.grid(row=0, column=0)
+        self.frame_booklists.grid(row=0, column=0, sticky="nsew")
+
+        self.frame_booklists.rowconfigure(0, weight=5)
+        self.frame_booklists.rowconfigure(1, weight=85)
+        self.frame_booklists.rowconfigure(2, weight=10)
+        self.frame_booklists.columnconfigure(0, weight=1)
 
         self.label_booklist_frame_title = tk.Label(self.frame_booklists, text="Booklists")
         self.label_booklist_frame_title.grid(row=0, column=0)
         
         self.listbox_booklists = tk.Listbox(self.frame_booklists)
-        self.listbox_booklists.grid(row=1, column=0, sticky="nsew")
+        self.listbox_booklists.grid(row=1, column=0, sticky="nsew", padx=5)
 
         # Booklist buttons frame
         self.frame_booklist_buttons = tk.Frame(self.frame_booklists)
-        self.frame_booklist_buttons.grid(row=2, column=0)
+        self.frame_booklist_buttons.grid(row=2, column=0, sticky="nsew")
+
+        self.frame_booklist_buttons.rowconfigure(0, weight=1)
+        self.frame_booklist_buttons.columnconfigure(0, weight=33)
+        self.frame_booklist_buttons.columnconfigure(1, weight=33)
+        self.frame_booklist_buttons.columnconfigure(2, weight=33)
 
         self.button_new_booklist = tk.Button(self.frame_booklist_buttons, text="New Booklist")
-        self.button_new_booklist.grid(row=0, column=0)
+        self.button_new_booklist.grid(row=0, column=0, padx=5, sticky="ew")
         
         self.button_rename_booklist = tk.Button(self.frame_booklist_buttons, text="Rename Booklist")
-        self.button_rename_booklist.grid(row=0, column=1)
+        self.button_rename_booklist.grid(row=0, column=1, padx=5, sticky="ew")
         
         self.button_delete_booklist = tk.Button(self.frame_booklist_buttons, text="Delete Booklist")
-        self.button_delete_booklist.grid(row=0, column=2)
+        self.button_delete_booklist.grid(row=0, column=2, padx=5, sticky="ew")
         
     def __create_books_frame(self):
         self.frame_books = tk.Frame(self.root)
-        self.frame_books.grid(row=0, column=2)
+        self.frame_books.grid(row=0, column=2, sticky="nsew")
+
+        self.frame_books.rowconfigure(0, weight=10)
+        self.frame_books.rowconfigure(1, weight=80)
+        self.frame_books.rowconfigure(2, weight=10)
+        self.frame_books.columnconfigure(0, weight=1)
 
         # Search frame
         self.frame_search = tk.Frame(self.frame_books)
-        self.frame_search.grid(row=0, column=0)
+        self.frame_search.grid(row=0, column=0, sticky="nsew")
 
-        self.label_search = tk.Label(self.frame_search, text="Search: ")
-        self.label_search.grid(row=0, column=0)
-        
+        self.frame_search.rowconfigure(0, weight=1)
+        self.frame_search.columnconfigure(0, weight=10)
+        self.frame_search.columnconfigure(1, weight=70)
+        self.frame_search.columnconfigure(2, weight=10)
+        self.frame_search.columnconfigure(3, weight=10)
+
+        self.label_search = tk.Label(self.frame_search, text="Search:")
+        self.label_search.grid(row=0, column=0, sticky="ew")
+
         self.entry_search = tk.Entry(self.frame_search)
-        self.entry_search.grid(row=0, column=1)
+        self.entry_search.grid(row=0, column=1, sticky="ew")
 
         self.to_filter = tk.StringVar(self.frame_search)
         self.to_filter.set("Title")
@@ -102,23 +125,47 @@ class ABS:
         options = ["TItle", "Author", "Publication Year"]
 
         self.options_search = tk.OptionMenu(self.frame_search, self.to_filter, *options)
-        self.options_search.grid(row=0, column=2)
-        self.button_search = tk.Button(self.frame_search, text="Search")
-        self.button_search.grid(row=0, column=3)
+        self.options_search.grid(row=0, column=2, sticky="ew")
 
-        self.treeview_books = ttk.Treeview(self.frame_books, show="headings")
-        self.treeview_books.grid(row=1, column=0)
+        self.button_search = tk.Button(self.frame_search, text="Search")
+        self.button_search.grid(row=0, column=3, sticky="ew")
+
+        # Books Treeview
+        self.frame_books_treeview = tk.Frame(self.frame_books)
+        self.frame_books_treeview.grid(row=1, column=0, sticky="nsew")
+
+        self.frame_books_treeview.rowconfigure(0, weight=98)
+        self.frame_books_treeview.rowconfigure(1, weight=2)
+        self.frame_books_treeview.columnconfigure(0, weight=98)
+        self.frame_books_treeview.columnconfigure(1, weight=2)
+
+        self.treeview_books = ttk.Treeview(self.frame_books_treeview, show="headings")
+
+        # Scrollbars
+        self.hscroll_books = ttk.Scrollbar(self.frame_books_treeview, orient="horizontal", command=self.treeview_books.xview)
+        self.vscroll_books = ttk.Scrollbar(self.frame_books_treeview, orient="vertical", command=self.treeview_books.yview)
+
+        self.treeview_books.configure(xscrollcommand=self.hscroll_books.set, yscrollcommand=self.vscroll_books.set)
+
+        self.treeview_books.grid(row=0, column=0, sticky="nsew")
+        self.vscroll_books.grid(row=0, column=1, sticky="ns")
+        self.hscroll_books.grid(row=1, column=0, sticky="ew")
 
         # Books buttons frame
         self.frame_books_buttons = tk.Frame(self.frame_books)
-        self.frame_books_buttons.grid(row=2, column=0)
+        self.frame_books_buttons.grid(row=2, column=0, sticky="nse")
+
+        self.frame_books_buttons.rowconfigure(0, weight=1)
+        self.frame_books_buttons.columnconfigure(0, weight=33)
+        self.frame_books_buttons.columnconfigure(1, weight=33)
+        self.frame_books_buttons.columnconfigure(2, weight=33)
 
         self.button_new_book = tk.Button(self.frame_books_buttons, text="New Book")
-        self.button_new_book.grid(row=0, column=0)
+        self.button_new_book.grid(row=0, column=0, sticky="e", padx=5)
         self.button_edit_book = tk.Button(self.frame_books_buttons, text="Edit Book")
-        self.button_edit_book.grid(row=0, column=1)
+        self.button_edit_book.grid(row=0, column=1, sticky="e", padx=5)
         self.button_delete_book = tk.Button(self.frame_books_buttons, text="Delete Book")
-        self.button_delete_book.grid(row=0, column=2)
+        self.button_delete_book.grid(row=0, column=2, sticky="e", padx=5)
 
     def repopulate_bookslists(self):
         for booklist in self.bookshelf.booklists.keys():
@@ -128,6 +175,7 @@ class ABS:
         self.treeview_books.configure(columns=columns)
         for column in columns:
             self.treeview_books.heading(column, text=column)
+            self.treeview_books.column(column, width=150, stretch=True)
 
     def reconfigure_filters(self, filters: list[str]):
         menu = self.options_search["menu"]
