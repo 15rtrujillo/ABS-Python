@@ -1,6 +1,7 @@
 import tkinter as tk
 
 
+from booklist import Booklist
 from bookshelf import Bookshelf
 from tkinter import ttk
 
@@ -8,12 +9,17 @@ from tkinter import ttk
 class ABS:
     def __init__(self, bookshelf: Bookshelf):
         self.bookshelf = bookshelf
+        self.selected_booklist: Booklist = bookshelf.booklists["All Books"]
 
         self.root = tk.Tk()
         self.root.title("Aurora's Bookshelf")
+        self.root.geometry("1200x600")
 
         self.__create_menu_bar()
         
+        self.root.columnconfigure(0, weight=2)
+        self.root.columnconfigure(1, weight=1)
+        self.root.columnconfigure(2, weight=3)
         self.__create_booklist_frame()
 
         # Vertical separator
@@ -22,9 +28,17 @@ class ABS:
 
         self.__create_books_frame()
 
+        # Add booklists to the listbox and select the "All Books" list.
+        self.repopulate_bookslists()
+        self.listbox_booklists.selection_set(0)
+        self.listbox_booklists.activate(0)
+
+        # Setup the treeview columns and the search filters
+        self.update_properties()
+
         self.root.mainloop()
 
-    def __create_menu_bar(self):                # Menu bar
+    def __create_menu_bar(self):
         self.menu_bar = tk.Menu(self.root)
 
         # File menu
@@ -50,8 +64,9 @@ class ABS:
 
         self.label_booklist_frame_title = tk.Label(self.frame_booklists, text="Booklists")
         self.label_booklist_frame_title.grid(row=0, column=0)
+        
         self.listbox_booklists = tk.Listbox(self.frame_booklists)
-        self.listbox_booklists.grid(row=1, column=0)
+        self.listbox_booklists.grid(row=1, column=0, sticky="nsew")
 
         # Booklist buttons frame
         self.frame_booklist_buttons = tk.Frame(self.frame_booklists)
@@ -59,11 +74,13 @@ class ABS:
 
         self.button_new_booklist = tk.Button(self.frame_booklist_buttons, text="New Booklist")
         self.button_new_booklist.grid(row=0, column=0)
+        
         self.button_rename_booklist = tk.Button(self.frame_booklist_buttons, text="Rename Booklist")
         self.button_rename_booklist.grid(row=0, column=1)
+        
         self.button_delete_booklist = tk.Button(self.frame_booklist_buttons, text="Delete Booklist")
         self.button_delete_booklist.grid(row=0, column=2)
-    
+        
     def __create_books_frame(self):
         self.frame_books = tk.Frame(self.root)
         self.frame_books.grid(row=0, column=2)
@@ -74,6 +91,7 @@ class ABS:
 
         self.label_search = tk.Label(self.frame_search, text="Search: ")
         self.label_search.grid(row=0, column=0)
+        
         self.entry_search = tk.Entry(self.frame_search)
         self.entry_search.grid(row=0, column=1)
 
@@ -88,7 +106,7 @@ class ABS:
         self.button_search = tk.Button(self.frame_search, text="Search")
         self.button_search.grid(row=0, column=3)
 
-        self.treeview_books = ttk.Treeview(self.frame_books)
+        self.treeview_books = ttk.Treeview(self.frame_books, show="headings")
         self.treeview_books.grid(row=1, column=0)
 
         # Books buttons frame
@@ -101,3 +119,24 @@ class ABS:
         self.button_edit_book.grid(row=0, column=1)
         self.button_delete_book = tk.Button(self.frame_books_buttons, text="Delete Book")
         self.button_delete_book.grid(row=0, column=2)
+
+    def repopulate_bookslists(self):
+        for booklist in self.bookshelf.booklists.keys():
+            self.listbox_booklists.insert(tk.END, booklist)
+
+    def reconfigure_treeview_columns(self, columns: list[str]):
+        self.treeview_books.configure(columns=columns)
+        for column in columns:
+            self.treeview_books.heading(column, text=column)
+
+    def reconfigure_filters(self, filters: list[str]):
+        menu = self.options_search["menu"]
+        menu.delete(0, "end")
+        for filter in filters:
+            menu.add_command(label=filter, command=tk._setit(self.to_filter, filter))
+
+    def update_properties(self):
+        all_properties = self.bookshelf.built_in_properties + self.bookshelf.custom_properties
+        self.reconfigure_treeview_columns(all_properties)
+        self.reconfigure_filters(all_properties)
+        

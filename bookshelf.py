@@ -11,6 +11,7 @@ class Bookshelf:
         self.books: dict[int, Book] = {}
         self.booklists: dict[str, Booklist] = {}
         self.max_book_id: int = 0
+        self.built_in_properties: list[str] = ["Title", "Author", "Publication Year"]
         self.custom_properties: list[str] = []
 
     def __load_books(self):        
@@ -32,7 +33,7 @@ class Bookshelf:
             if id > self.max_book_id:
                 self.max_book_id = id
 
-            custom_properties = book["custom_properties"].keys()
+            custom_properties = [*book["custom_properties"]]
             if not self.custom_properties:
                 self.custom_properties = custom_properties
             elif self.custom_properties != custom_properties:
@@ -80,6 +81,9 @@ class Bookshelf:
             return
         
         self.__load_books()
+
+        all_books = Booklist("All Books", False, *self.books.keys())
+        self.booklists[all_books.name] = all_books
 
         self.__load_booklists()
         
