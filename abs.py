@@ -183,7 +183,7 @@ class ABS:
         for book_id in self.selected_booklist.books:
             book = self.bookshelf.books[book_id]
             self.treeview_books.insert("", "end",
-                                       text=book.title,
+                                       text=str(book_id),
                                        values=([book.title, book.author, book.publication_year] + [*book.custom_properties.values()]))
     
     def reconfigure_treeview_columns(self, columns: list[str]):
@@ -193,7 +193,7 @@ class ABS:
             self.treeview_books.column(column, width=150, stretch=True)
 
     def reconfigure_filters(self, filters: list[str]):
-        menu = self.options_search["menu"]
+        menu: tk.Menu = self.options_search["menu"]
         menu.delete(0, "end")
         for filter in filters:
             menu.add_command(label=filter, command=tk._setit(self.to_filter, filter))
@@ -205,4 +205,3 @@ class ABS:
 
     def show_window(self):
         self.root.mainloop()
-        
