@@ -1,9 +1,9 @@
-import tkinter as tk
-
-
 from booklist import Booklist
 from bookshelf import Bookshelf
-from tkinter import ttk
+
+
+import tkinter as tk
+import tkinter.ttk as ttk
 
 
 class ABS:
@@ -73,6 +73,7 @@ class ABS:
         self.label_booklist_frame_title.grid(row=0, column=0)
         
         self.listbox_booklists = tk.Listbox(self.frame_booklists)
+        self.listbox_booklists.bind("<<ListboxSelect>>", lambda e: self.listbox_booklists_selection_changed(self.listbox_booklists.curselection()))
         self.listbox_booklists.grid(row=1, column=0, sticky="nsew", padx=5)
 
         # Booklist buttons frame
@@ -167,11 +168,18 @@ class ABS:
         self.button_delete_book = tk.Button(self.frame_books_buttons, text="Delete Book")
         self.button_delete_book.grid(row=0, column=2, sticky="e", padx=5)
 
+    def listbox_booklists_selection_changed(self, selected_item: list[int]):
+        self.selected_booklist = self.bookshelf.booklists[self.listbox_booklists.get(selected_item)]
+        self.repopulate_books()
+
     def repopulate_bookslists(self):
         for booklist in self.bookshelf.booklists.keys():
-            self.listbox_booklists.insert(tk.END, booklist + f" ({len(self.bookshelf.booklists[booklist].books)} books)")
+            self.listbox_booklists.insert(tk.END, booklist)
 
     def repopulate_books(self):
+        for item in self.treeview_books.get_children():
+            self.treeview_books.delete(item)
+
         for book_id in self.selected_booklist.books:
             book = self.bookshelf.books[book_id]
             self.treeview_books.insert("", "end",

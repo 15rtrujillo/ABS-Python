@@ -28,11 +28,12 @@ class Bookshelf:
             print("Error decoding Bookshelf JSON")
             return
         
-        for book in bookshelf_json:
-            id = book["id"]
+        for book_entry in bookshelf_json:
+            id = book_entry["id"]
             if id > self.max_book_id:
                 self.max_book_id = id
 
+            book = book_entry["book"]
             custom_properties = [*book["custom_properties"]]
             if not self.custom_properties:
                 self.custom_properties = custom_properties
@@ -41,7 +42,6 @@ class Bookshelf:
                 exit()
 
             new_book = Book(
-                id,
                 book["title"],
                 book["author"],
                 book["publication_year"],

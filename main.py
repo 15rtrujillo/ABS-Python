@@ -1,7 +1,7 @@
-import abs
-
-
 from bookshelf import Bookshelf
+
+
+import abs
 
 
 def main():
