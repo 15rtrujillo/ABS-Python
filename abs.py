@@ -1,8 +1,12 @@
+from book import Book
 from booklist import Booklist
 from bookshelf import Bookshelf
+from edit_book import EditBook
 
 
+import copy
 import tkinter as tk
+import tkinter.messagebox as msgbox
 import tkinter.ttk as ttk
 
 
@@ -161,15 +165,18 @@ class ABS:
         self.frame_books_buttons.columnconfigure(1, weight=33)
         self.frame_books_buttons.columnconfigure(2, weight=33)
 
-        self.button_new_book = tk.Button(self.frame_books_buttons, text="New Book")
+        self.button_new_book = tk.Button(self.frame_books_buttons, text="New Book", command=lambda: self.button_new_edit_book_clicked(False))
         self.button_new_book.grid(row=0, column=0, sticky="e", padx=5)
-        self.button_edit_book = tk.Button(self.frame_books_buttons, text="Edit Book")
+        self.button_edit_book = tk.Button(self.frame_books_buttons, text="Edit Book", command=lambda: self.button_new_edit_book_clicked(True))
         self.button_edit_book.grid(row=0, column=1, sticky="e", padx=5)
         self.button_delete_book = tk.Button(self.frame_books_buttons, text="Delete Book")
         self.button_delete_book.grid(row=0, column=2, sticky="e", padx=5)
 
-    def listbox_booklists_selection_changed(self, selected_item: list[int]):
-        self.selected_booklist = self.bookshelf.booklists[self.listbox_booklists.get(selected_item)]
+    def listbox_booklists_selection_changed(self, selected_item: tuple[int]):
+        if not selected_item:
+            return
+        
+        self.selected_booklist = self.bookshelf.booklists[self.listbox_booklists.get(selected_item[0])]
         self.repopulate_books()
 
     def repopulate_bookslists(self):
@@ -205,3 +212,22 @@ class ABS:
 
     def show_window(self):
         self.root.mainloop()
+
+    def button_new_edit_book_clicked(self, edit: bool):
+        if edit:
+            selected_item = self.treeview_books.selection()[0]
+            selected_book_id = int(self.treeview_books.item(selected_item)["text"])
+            book = copy.deepcopy(self.bookshelf.books[selected_book_id])
+        else:
+            book = Book("", "", 0, *self.bookshelf.custom_properties)
+        
+        edit_book_window = EditBook(self.root, book)
+        self.root.wait_window(edit_book_window.root)
+
+        if edit_book_window.confirmed:
+            if edit:
+                self.bookshelf.books[selected_book_id] = edit_book_window.book
+            else:
+                self.bookshelf.add_book(edit_book_window.book)
+
+        self.repopulate_books()         

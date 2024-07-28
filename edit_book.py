@@ -93,6 +93,13 @@ class EditBook:
                     
     def confirm(self):
         self.confirmed = True
+
+        self.book.title = self.entry_properties_dict["Title"].get()
+        self.book.author = self.entry_properties_dict["Author"].get()
+        self.book.publication_year = self.entry_properties_dict["Publication Year"].get()
+        for property in self.book.custom_properties.keys():
+            self.book.custom_properties[property] = self.entry_properties_dict[property].get()
+
         self.root.destroy()
 
 

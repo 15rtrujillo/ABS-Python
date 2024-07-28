@@ -86,4 +86,11 @@ class Bookshelf:
         self.booklists[all_books.name] = all_books
 
         self.__load_booklists()
+
+    def add_book(self, book: Book):
+        self.max_book_id += 1
+        book_id = self.max_book_id
+
+        self.books[book_id] = book
+        self.booklists["All Books"].books.append(book_id)
         
