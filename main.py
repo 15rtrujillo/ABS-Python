@@ -1,14 +1,12 @@
-from bookshelf import Bookshelf
-
-
 import abs
+import bookshelf
 
 
 def main():
-    bookshelf = Bookshelf()
-    bookshelf.load()
+    shelf = bookshelf.Bookshelf()
+    shelf.load()
 
-    window = abs.ABS(bookshelf)
+    window = abs.ABS(shelf)
     window.show_window()
 
 

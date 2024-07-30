@@ -2,6 +2,7 @@ from book import Book
 from booklist import Booklist
 from bookshelf import Bookshelf
 from edit_book import EditBook
+from scrollable_treeview import ScrollableTreeview
 
 
 import copy
@@ -126,7 +127,6 @@ class ABS:
         self.to_filter = tk.StringVar(self.frame_search)
         self.to_filter.set("Title")
 
-        # Temporary
         options = ["TItle", "Author", "Publication Year"]
 
         self.options_search = tk.OptionMenu(self.frame_search, self.to_filter, *options)
@@ -136,25 +136,10 @@ class ABS:
         self.button_search.grid(row=0, column=3, sticky="ew")
 
         # Books Treeview
-        self.frame_books_treeview = tk.Frame(self.frame_books)
-        self.frame_books_treeview.grid(row=1, column=0, sticky="nsew")
+        self.scrollable_treeview_books = ScrollableTreeview(self.frame_books)
+        self.scrollable_treeview_books.grid(row=1, column=0, sticky="nsew")
 
-        self.frame_books_treeview.rowconfigure(0, weight=98)
-        self.frame_books_treeview.rowconfigure(1, weight=2)
-        self.frame_books_treeview.columnconfigure(0, weight=98)
-        self.frame_books_treeview.columnconfigure(1, weight=2)
-
-        self.treeview_books = ttk.Treeview(self.frame_books_treeview, show="headings")
-
-        # Scrollbars
-        self.hscroll_books = ttk.Scrollbar(self.frame_books_treeview, orient="horizontal", command=self.treeview_books.xview)
-        self.vscroll_books = ttk.Scrollbar(self.frame_books_treeview, orient="vertical", command=self.treeview_books.yview)
-
-        self.treeview_books.configure(xscrollcommand=self.hscroll_books.set, yscrollcommand=self.vscroll_books.set)
-
-        self.treeview_books.grid(row=0, column=0, sticky="nsew")
-        self.vscroll_books.grid(row=0, column=1, sticky="ns")
-        self.hscroll_books.grid(row=1, column=0, sticky="ew")
+        self.treeview_books = self.scrollable_treeview_books.treeview
 
         # Books buttons frame
         self.frame_books_buttons = tk.Frame(self.frame_books)
@@ -213,13 +198,27 @@ class ABS:
     def show_window(self):
         self.root.mainloop()
 
-    def button_new_edit_book_clicked(self, edit: bool):
-        if edit:
-            selected_item = self.treeview_books.selection()[0]
-            selected_book_id = int(self.treeview_books.item(selected_item)["text"])
-            book = copy.deepcopy(self.bookshelf.books[selected_book_id])
-        else:
-            book = Book("", "", 0, *self.bookshelf.custom_properties)
+    def button_new_book_clicked(self):
+        """Display the window to create a new book or add a book to a booklist"""
+        book = Book("", "", 0, *self.bookshelf.custom_properties)
+
+        edit_book_window = EditBook(self.root, book)
+        self.root.wait_window(edit_book_window.root)
+
+        if edit_book_window.confirmed:
+            self.bookshelf.add_book(edit_book_window.book)
+
+        self.repopulate_books()
+
+    def button_edit_book_clicked(self):
+        selected_items = self.treeview_books.selection()
+        if not selected_items:
+            msgbox.showerror("Select a Book", "Please select a book to edit")
+            return
+        
+        selected_item = selected_items[0]
+        selected_book_id = int(self.treeview_books.item(selected_item)["text"])
+        book = copy.deepcopy(self.bookshelf.books[selected_book_id])
         
         edit_book_window = EditBook(self.root, book)
         self.root.wait_window(edit_book_window.root)
