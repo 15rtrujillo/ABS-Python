@@ -1,7 +1,7 @@
 from book import Book
 from booklist import Booklist
 from bookshelf import Bookshelf
-from edit_book import EditBook
+from edit_book_window import EditBookWindow
 from scrollable_treeview import ScrollableTreeview
 
 
@@ -150,9 +150,9 @@ class ABS:
         self.frame_books_buttons.columnconfigure(1, weight=33)
         self.frame_books_buttons.columnconfigure(2, weight=33)
 
-        self.button_new_book = tk.Button(self.frame_books_buttons, text="New Book", command=lambda: self.button_new_edit_book_clicked(False))
+        self.button_new_book = tk.Button(self.frame_books_buttons, text="New Book", command=self.button_new_book_clicked)
         self.button_new_book.grid(row=0, column=0, sticky="e", padx=5)
-        self.button_edit_book = tk.Button(self.frame_books_buttons, text="Edit Book", command=lambda: self.button_new_edit_book_clicked(True))
+        self.button_edit_book = tk.Button(self.frame_books_buttons, text="Edit Book", command=self.button_edit_book_clicked)
         self.button_edit_book.grid(row=0, column=1, sticky="e", padx=5)
         self.button_delete_book = tk.Button(self.frame_books_buttons, text="Delete Book")
         self.button_delete_book.grid(row=0, column=2, sticky="e", padx=5)
@@ -202,8 +202,8 @@ class ABS:
         """Display the window to create a new book or add a book to a booklist"""
         book = Book("", "", 0, *self.bookshelf.custom_properties)
 
-        edit_book_window = EditBook(self.root, book)
-        self.root.wait_window(edit_book_window.root)
+        edit_book_window = EditBookWindow(self.root, book)
+        self.root.wait_window(edit_book_window)
 
         if edit_book_window.confirmed:
             self.bookshelf.add_book(edit_book_window.book)
@@ -220,13 +220,10 @@ class ABS:
         selected_book_id = int(self.treeview_books.item(selected_item)["text"])
         book = copy.deepcopy(self.bookshelf.books[selected_book_id])
         
-        edit_book_window = EditBook(self.root, book)
-        self.root.wait_window(edit_book_window.root)
+        edit_book_window = EditBookWindow(self.root, book)
+        self.root.wait_window(edit_book_window)
 
         if edit_book_window.confirmed:
-            if edit:
-                self.bookshelf.books[selected_book_id] = edit_book_window.book
-            else:
-                self.bookshelf.add_book(edit_book_window.book)
+            self.bookshelf.books[selected_book_id] = edit_book_window.book
 
         self.repopulate_books()         

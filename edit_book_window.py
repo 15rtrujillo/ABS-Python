@@ -5,28 +5,28 @@ import tkinter as tk
 import tkinter.ttk as ttk
 
 
-class EditBook:
+class EditBookWindow(tk.Toplevel):
     def __init__(self, main_window: tk.Tk, book: Book):
+        super().__init__(main_window)
         self.book: Book = book
         self.confirmed = False
         
-        self.root = tk.Toplevel(main_window)
         if not book.title:
-            self.root.title("New Book")
+            self.title("New Book")
         else:
-            self.root.title("Edit Book")
+            self.title("Edit Book")
 
-        self.root.grab_set()
+        self.grab_set()
 
-        self.root.rowconfigure(0, weight=5)
-        self.root.rowconfigure(1, weight=75)
-        self.root.rowconfigure(2, weight=10)
-        self.root.columnconfigure(0, weight=1)
+        self.rowconfigure(0, weight=5)
+        self.rowconfigure(1, weight=75)
+        self.rowconfigure(2, weight=10)
+        self.columnconfigure(0, weight=1)
 
-        self.label_instructions = tk.Label(self.root, text="Please specify the following information:")
+        self.label_instructions = tk.Label(self, text="Please specify the following information:")
         self.label_instructions.grid(row=0, column=0, sticky="ew")
 
-        self.frame_canvas = tk.Frame(self.root)
+        self.frame_canvas = tk.Frame(self)
         self.frame_canvas.grid(row=1, column=0, sticky="nsew")
 
         self.frame_canvas.rowconfigure(0, weight=1)
@@ -55,7 +55,7 @@ class EditBook:
         self.entry_properties_dict: dict[str, tk.Entry] = {}
         self.populate_form()
 
-        self.frame_buttons = tk.Frame(self.root)
+        self.frame_buttons = tk.Frame(self)
         self.frame_buttons.grid(row=2, column=0)
 
         self.frame_buttons.rowconfigure(0, weight=1)
@@ -65,7 +65,7 @@ class EditBook:
         self.button_confirm = tk.Button(self.frame_buttons, text="Confirm", command=self.confirm)
         self.button_confirm.grid(row=0, column=0, sticky="ew", padx=5)
 
-        self.button_cancel = tk.Button(self.frame_buttons, text="Cancel", command=self.root.destroy)
+        self.button_cancel = tk.Button(self.frame_buttons, text="Cancel", command=self.destroy)
         self.button_cancel.grid(row=0, column=1, sticky="ew", padx=5)
 
     def populate_form(self):
@@ -87,7 +87,7 @@ class EditBook:
                 elif property == "Author":
                     entry.insert(0, self.book.author)
                 elif property == "Publication Year":
-                    entry.insert(0, str(self.book.publication_year))
+                    entry.insert(0, self.book.publication_year)
                 else:
                     entry.insert(0, self.book.custom_properties[property])
                     
@@ -100,11 +100,11 @@ class EditBook:
         for property in self.book.custom_properties.keys():
             self.book.custom_properties[property] = self.entry_properties_dict[property].get()
 
-        self.root.destroy()
+        self.destroy()
 
 
 if __name__ == "__main__":
     my_book = Book("My Princess", "Ryan", 1995, "Price", "Location")
     root = tk.Tk()
-    root.bind("<Visibility>", lambda e: EditBook(root, my_book))
+    root.bind("<Visibility>", lambda e: EditBookWindow(root, my_book))
     tk.mainloop()
