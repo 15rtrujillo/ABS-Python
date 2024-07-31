@@ -1,3 +1,4 @@
+from about_window import AboutWindow
 from book import Book
 from booklist import Booklist
 from bookshelf import Bookshelf
@@ -60,7 +61,7 @@ class ABS:
 
         # Help Menu
         self.help_menu = tk.Menu(self.menu_bar, tearoff=0)
-        self.help_menu.add_command(label="About")
+        self.help_menu.add_command(label="About", command=lambda: AboutWindow(self.root))
         self.menu_bar.add_cascade(label="Help", menu=self.help_menu)
 
         self.root.config(menu=self.menu_bar)
@@ -78,7 +79,7 @@ class ABS:
         self.label_booklist_frame_title.grid(row=0, column=0)
         
         self.listbox_booklists = tk.Listbox(self.frame_booklists)
-        self.listbox_booklists.bind("<<ListboxSelect>>", lambda e: self.listbox_booklists_selection_changed(self.listbox_booklists.curselection()))
+        self.listbox_booklists.bind("<<ListboxSelect>>", lambda _: self.listbox_booklists_selection_changed(self.listbox_booklists.curselection()))
         self.listbox_booklists.grid(row=1, column=0, sticky="nsew", padx=5)
 
         # Booklist buttons frame
@@ -202,7 +203,7 @@ class ABS:
         """Display the window to create a new book or add a book to a booklist"""
         book = Book("", "", 0, *self.bookshelf.custom_properties)
 
-        edit_book_window = EditBookWindow(self.root, book)
+        edit_book_window = EditBookWindow(self.root, book, self.bookshelf)
         self.root.wait_window(edit_book_window)
 
         if edit_book_window.confirmed:
@@ -220,7 +221,7 @@ class ABS:
         selected_book_id = int(self.treeview_books.item(selected_item)["text"])
         book = copy.deepcopy(self.bookshelf.books[selected_book_id])
         
-        edit_book_window = EditBookWindow(self.root, book)
+        edit_book_window = EditBookWindow(self.root, book, self.bookshelf)
         self.root.wait_window(edit_book_window)
 
         if edit_book_window.confirmed:

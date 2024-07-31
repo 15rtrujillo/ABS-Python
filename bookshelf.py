@@ -47,6 +47,7 @@ class Bookshelf:
                 book["publication_year"],
                 *custom_properties
             )
+            new_book.id = id
             new_book.define_custom_property(**book["custom_properties"])
 
             self.books[id] = new_book
@@ -90,6 +91,8 @@ class Bookshelf:
     def add_book(self, book: Book):
         self.max_book_id += 1
         book_id = self.max_book_id
+
+        book.id = book_id
 
         self.books[book_id] = book
         self.booklists["All Books"].books.append(book_id)
