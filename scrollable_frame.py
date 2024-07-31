@@ -12,19 +12,13 @@ class ScrollableFrame(tk.Frame):
 
         self.canvas = tk.Canvas(self)
         self.vscroll = ttk.Scrollbar(self, orient="vertical", command=self.canvas.yview)
-        self.inner_frame = tk.Frame(self.canvas)
+        self.canvas.grid(row=0, column=0, sticky="nsew")
+        self.vscroll.grid(row=0, column=1, sticky="ns")
 
-        self.inner_frame.bind(
-            "<Configure>",
-            lambda _: self.canvas.configure(
-                scrollregion=self.canvas.bbox("all")
-            )
-        )
+        self.canvas.configure(yscrollcommand=self.vscroll.set)
+        self.canvas.bind('<Configure>', lambda _: self.canvas.configure(scrollregion=self.canvas.bbox("all")))
+
+        self.inner_frame = tk.Frame(self.canvas)
 
         self.canvas.create_window((0, 0), window=self.inner_frame, anchor="nw")
 
-        self.canvas.configure(yscrollcommand=self.vscroll.set)
-
-        self.canvas.grid(row=0, column=0, sticky="nsew")
-        self.vscroll.grid(row=0, column=1, sticky="ns")
-        self.inner_frame.grid(row=0, column=0, sticky="nsew")
