@@ -207,7 +207,12 @@ class ABS:
         self.root.wait_window(edit_book_window)
 
         if edit_book_window.confirmed:
-            self.bookshelf.add_book(edit_book_window.book)
+            selected_booklists: list[str] = []
+            for name, value in edit_book_window.checkbutton_booklist_dict.items():
+                if value.get() == 1:
+                    selected_booklists.append(name)
+
+            self.bookshelf.add_book(edit_book_window.book, selected_booklists)
 
         self.repopulate_books()
 
@@ -225,6 +230,11 @@ class ABS:
         self.root.wait_window(edit_book_window)
 
         if edit_book_window.confirmed:
-            self.bookshelf.books[selected_book_id] = edit_book_window.book
+            selected_booklists: list[str] = []
+            for name, value in edit_book_window.checkbutton_booklist_dict.items():
+                if value.get() == 1:
+                    selected_booklists.append(name)
+
+            self.bookshelf.update_book(edit_book_window.book, selected_booklists)
 
         self.repopulate_books()         

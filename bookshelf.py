@@ -88,7 +88,7 @@ class Bookshelf:
 
         self.__load_booklists()
 
-    def add_book(self, book: Book):
+    def add_book(self, book: Book, booklists: list[str] | None = None):
         self.max_book_id += 1
         book_id = self.max_book_id
 
@@ -96,4 +96,30 @@ class Bookshelf:
 
         self.books[book_id] = book
         self.booklists["All Books"].books.append(book_id)
+
+        if booklists is not None:
+            for booklist_name in booklists:
+                self.booklists[booklist_name].books.append(book_id)
+
+        # Save all
+
+    def update_book(self, book: Book, booklists: list[str] | None = None):
+        # Replace the book with the new one
+        self.books[book.id] = book
+
+        for name, list in self.booklists.items():
+            if not list.is_user_created:
+                continue
+            
+            # If the current booklist is one the book should be in
+            if name in booklists:
+                # Check if it's in there. If it isn't, add it.
+                if not book.id in list.books:
+                    list.books.append(book.id)
+            else:
+                # If it shouldn't be in the booklist, remove it if it's there.
+                if book.id in list.books:
+                    list.books.remove(book.id)
+
+        # Save all
         
