@@ -110,7 +110,7 @@ class Bookshelf:
         for name, list in self.booklists.items():
             if not list.is_user_created:
                 continue
-            
+
             # If the current booklist is one the book should be in
             if name in booklists:
                 # Check if it's in there. If it isn't, add it.
@@ -120,6 +120,17 @@ class Bookshelf:
                 # If it shouldn't be in the booklist, remove it if it's there.
                 if book.id in list.books:
                     list.books.remove(book.id)
+
+        # Save all
+
+    def delete_book(self, book: Book):
+        for booklist in self.booklists.values():
+            try:
+                booklist.books.remove(book.id)
+            except ValueError:
+                continue
+        
+        del self.books[book.id]
 
         # Save all
         

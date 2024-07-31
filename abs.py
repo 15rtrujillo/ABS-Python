@@ -155,15 +155,24 @@ class ABS:
         self.button_new_book.grid(row=0, column=0, sticky="e", padx=5)
         self.button_edit_book = tk.Button(self.frame_books_buttons, text="Edit Book", command=self.button_edit_book_clicked)
         self.button_edit_book.grid(row=0, column=1, sticky="e", padx=5)
-        self.button_delete_book = tk.Button(self.frame_books_buttons, text="Delete Book")
+        self.button_delete_book = tk.Button(self.frame_books_buttons, text="Delete Book", command=self.button_delete_book_clicked)
         self.button_delete_book.grid(row=0, column=2, sticky="e", padx=5)
 
     def listbox_booklists_selection_changed(self, selected_item: tuple[int]):
         if not selected_item:
             return
         
-        self.selected_booklist = self.bookshelf.booklists[self.listbox_booklists.get(selected_item[0])]
+        selected_booklist_name = self.listbox_booklists.get(selected_item[0])
+        selected_booklist = self.bookshelf.booklists[selected_booklist_name]
+        self.selected_booklist = selected_booklist
         self.repopulate_books()
+
+        if selected_booklist.is_user_created:
+            self.button_new_book.configure(text="Add Book(s)")
+            self.button_delete_book.configure(text="Remove Book(s)")
+        else:
+            self.button_new_book.configure(text="New Book", command=self.button_new_book_clicked)
+            self.button_delete_book.configure(text="Delete Book", command=self.button_delete_book_clicked)
 
     def repopulate_bookslists(self):
         for booklist in self.bookshelf.booklists.keys():
@@ -199,6 +208,15 @@ class ABS:
     def show_window(self):
         self.root.mainloop()
 
+    def get_selected_book_id(self, message: str) -> int:
+        selected_items = self.treeview_books.selection()
+        if not selected_items:
+            msgbox.showerror("Select a Book", "Please select a book to " + message + ".")
+            return -1
+        
+        selected_item = selected_items[0]
+        return int(self.treeview_books.item(selected_item)["text"])
+
     def button_new_book_clicked(self):
         """Display the window to create a new book or add a book to a booklist"""
         book = Book("", "", 0, *self.bookshelf.custom_properties)
@@ -217,13 +235,10 @@ class ABS:
         self.repopulate_books()
 
     def button_edit_book_clicked(self):
-        selected_items = self.treeview_books.selection()
-        if not selected_items:
-            msgbox.showerror("Select a Book", "Please select a book to edit")
+        selected_book_id = self.get_selected_book_id("edit")
+        if selected_book_id == -1:
             return
         
-        selected_item = selected_items[0]
-        selected_book_id = int(self.treeview_books.item(selected_item)["text"])
         book = copy.deepcopy(self.bookshelf.books[selected_book_id])
         
         edit_book_window = EditBookWindow(self.root, book, self.bookshelf)
@@ -237,4 +252,18 @@ class ABS:
 
             self.bookshelf.update_book(edit_book_window.book, selected_booklists)
 
-        self.repopulate_books()         
+        self.repopulate_books()
+
+    def button_delete_book_clicked(self):
+        selected_book_id = self.get_selected_book_id("delete")
+        if selected_book_id == -1:
+            return
+        
+        selected_book = self.bookshelf.books[selected_book_id]
+        
+        result = msgbox.askyesno("Delete Book", "Are you sure you wish to pernamently delete " + selected_book.title + "?")
+
+        if result:
+            self.bookshelf.delete_book(selected_book)
+
+        self.repopulate_books()
