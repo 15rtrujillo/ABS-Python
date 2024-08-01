@@ -261,7 +261,7 @@ class ABS:
         
         selected_book = self.bookshelf.books[selected_book_id]
         
-        result = msgbox.askyesno("Delete Book", "Are you sure you wish to pernamently delete " + selected_book.title + "?")
+        result = msgbox.askyesno("Delete Book", "Are you sure you wish to pernamently delete \"" + selected_book.title + "\"?")
 
         if result:
             self.bookshelf.delete_book(selected_book)
