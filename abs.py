@@ -175,8 +175,13 @@ class ABS:
             self.button_delete_book.configure(text="Delete Book", command=self.button_delete_book_clicked)
 
     def repopulate_bookslists(self):
-        for booklist in self.bookshelf.booklists.keys():
-            self.listbox_booklists.insert(tk.END, booklist)
+        self.listbox_booklists.delete(0, tk.END)
+
+        self.listbox_booklists.insert(tk.END, "All Books")
+        for booklist in self.bookshelf.booklists.values():
+            if not booklist.is_user_created:
+                continue
+            self.listbox_booklists.insert(tk.END, booklist.name)
 
     def repopulate_books(self):
         for item in self.treeview_books.get_children():
@@ -217,8 +222,10 @@ class ABS:
         selected_item = selected_items[0]
         return int(self.treeview_books.item(selected_item)["text"])
 
+    def button_rename_booklist_clicked(self):
+        pass
+
     def button_new_book_clicked(self):
-        """Display the window to create a new book or add a book to a booklist"""
         book = Book("", "", 0, *self.bookshelf.custom_properties)
 
         edit_book_window = EditBookWindow(self.root, book, self.bookshelf)

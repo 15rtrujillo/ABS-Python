@@ -1,3 +1,4 @@
+import copy
 import file_utils
 import json
 
@@ -133,4 +134,15 @@ class Bookshelf:
         del self.books[book.id]
 
         # Save all
+
+    def rename_booklist(self, old_name: str, new_name: str):
+        old_booklist = self.booklists[old_name]
+        new_booklist = copy.deepcopy(old_booklist)
+        new_booklist.name = new_name
+
+        del self.booklists[old_name]
+
+        self.booklists[new_name] = new_booklist
+
+        # Save booklists
         
