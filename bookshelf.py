@@ -11,7 +11,7 @@ class Bookshelf:
     def __init__(self):
         self.books: dict[int, Book] = {}
         self.booklists: dict[str, Booklist] = {}
-        self.max_book_id: int = 0
+        self.max_book_id: int = -1
         self.built_in_properties: list[str] = ["Title", "Author", "Publication Year"]
         self.custom_properties: list[str] = []
 
@@ -29,12 +29,11 @@ class Bookshelf:
             print("Error decoding Bookshelf JSON")
             return
         
-        for book_entry in bookshelf_json:
-            id = book_entry["id"]
+        for book in bookshelf_json:
+            id = book["id"]
             if id > self.max_book_id:
                 self.max_book_id = id
 
-            book = book_entry["book"]
             custom_properties = [*book["custom_properties"]]
             if not self.custom_properties:
                 self.custom_properties = custom_properties
@@ -75,6 +74,22 @@ class Bookshelf:
  
             self.booklists[list_json["name"]] = new_booklist
 
+    def __save_books(self):
+        file_name = "Data/Bookshelf.abs"
+        file = open(file_utils.get_file_path(file_name), "w")
+
+        json.dump([*self.books.values()], file, default=vars, indent=4)
+
+    def __save_booklists(self):
+        for booklist in self.booklists.values():
+            if not booklist.is_user_created:
+                continue
+
+            file_name = booklist.name + ".list"
+            file = open(file_utils.get_file_path("Data/" + file_name), "w")
+            
+            json.dump(booklist, file, default=vars, indent=4)
+
     def load(self):
         # Check if the data directory exists. If it doesn't, we create it
         if not file_utils.data_directory_exists():
@@ -87,6 +102,15 @@ class Bookshelf:
         self.booklists[all_books.name] = all_books
 
         self.__load_booklists()
+
+    def save(self):
+        # Check if the data directory exists. If it doesn't, we create it
+        if not file_utils.data_directory_exists():
+            print("Data directory does not exist. Creating...")
+            file_utils.create_data_directory()
+
+        self.__save_booklists()
+        self.__save_books()
 
     def add_book(self, book: Book, booklists: list[str] | None = None):
         self.max_book_id += 1
@@ -101,7 +125,7 @@ class Bookshelf:
             for booklist_name in booklists:
                 self.booklists[booklist_name].books.append(book_id)
 
-        # Save all
+        self.save()
 
     def update_book(self, book: Book, booklists: list[str] | None = None):
         # Replace the book with the new one
@@ -121,7 +145,7 @@ class Bookshelf:
                 if book.id in list.books:
                     list.books.remove(book.id)
 
-        # Save all
+        self.save()
 
     def delete_book(self, book: Book):
         for booklist in self.booklists.values():
@@ -132,7 +156,7 @@ class Bookshelf:
         
         del self.books[book.id]
 
-        # Save all
+        self.save()
 
     def new_booklist(self, name: str):
         # Check if the new name already exists
@@ -142,7 +166,7 @@ class Bookshelf:
         new_booklist = Booklist(name, True)
         self.booklists[name] = new_booklist
 
-        # Save booklists
+        self.__save_booklists()
 
     def rename_booklist(self, old_name: str, new_name: str):
         # Check if the new name already exists
@@ -155,11 +179,19 @@ class Bookshelf:
 
         del self.booklists[old_name]
 
+        # Delete the file
+        old_file_name = "Data/" + old_name + ".list"
+        file_utils.delete_file(file_utils.get_file_path(old_file_name))
+
         self.booklists[new_name] = new_booklist
 
-        # Save booklists
+        self.__save_booklists()
 
     def delete_booklist(self, booklist: Booklist):
+        # Delete the file
+        old_file_name = "Data/" + booklist.name + ".list"
+        file_utils.delete_file(file_utils.get_file_path(old_file_name))
+        
         del self.booklists[booklist.name]
         
-        # Save booklists
+        self.__save_booklists()

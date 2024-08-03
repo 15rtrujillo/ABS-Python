@@ -20,6 +20,10 @@ def get_files_in_directory(directory: str) -> list[str]:
     return files
 
 
+def delete_file(file_path: str):
+    os.remove(file_path)
+
+
 def data_directory_exists() -> bool:
     return os.path.exists(get_data_directory())
 
