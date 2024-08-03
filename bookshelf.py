@@ -80,7 +80,6 @@ class Bookshelf:
         if not file_utils.data_directory_exists():
             print("Data directory does not exist. Creating...")
             file_utils.create_data_directory()
-            return
         
         self.__load_books()
 
@@ -135,7 +134,21 @@ class Bookshelf:
 
         # Save all
 
+    def new_booklist(self, name: str):
+        # Check if the new name already exists
+        if name in self.booklists.keys():
+            raise ValueError()
+        
+        new_booklist = Booklist(name, True)
+        self.booklists[name] = new_booklist
+
+        # Save booklists
+
     def rename_booklist(self, old_name: str, new_name: str):
+        # Check if the new name already exists
+        if new_name in self.booklists.keys():
+            raise ValueError()
+        
         old_booklist = self.booklists[old_name]
         new_booklist = copy.deepcopy(old_booklist)
         new_booklist.name = new_name

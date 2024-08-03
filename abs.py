@@ -3,6 +3,7 @@ from book import Book
 from booklist import Booklist
 from bookshelf import Bookshelf
 from edit_book_window import EditBookWindow
+from name_booklist_window import NameBooklistWindow
 from scrollable_treeview import ScrollableTreeview
 
 
@@ -79,7 +80,7 @@ class ABS:
         self.label_booklist_frame_title.grid(row=0, column=0)
         
         self.listbox_booklists = tk.Listbox(self.frame_booklists)
-        self.listbox_booklists.bind("<<ListboxSelect>>", lambda _: self.listbox_booklists_selection_changed(self.listbox_booklists.curselection()))
+        self.listbox_booklists.bind("<<ListboxSelect>>", lambda _: self.listbox_booklists_selection_changed())
         self.listbox_booklists.grid(row=1, column=0, sticky="nsew", padx=5)
 
         # Booklist buttons frame
@@ -91,10 +92,10 @@ class ABS:
         self.frame_booklist_buttons.columnconfigure(1, weight=33)
         self.frame_booklist_buttons.columnconfigure(2, weight=33)
 
-        self.button_new_booklist = tk.Button(self.frame_booklist_buttons, text="New Booklist")
+        self.button_new_booklist = tk.Button(self.frame_booklist_buttons, text="New Booklist", command=self.button_new_booklist_clicked)
         self.button_new_booklist.grid(row=0, column=0, padx=5, sticky="ew")
         
-        self.button_rename_booklist = tk.Button(self.frame_booklist_buttons, text="Rename Booklist")
+        self.button_rename_booklist = tk.Button(self.frame_booklist_buttons, text="Rename Booklist", command=self.button_rename_booklist_clicked)
         self.button_rename_booklist.grid(row=0, column=1, padx=5, sticky="ew")
         
         self.button_delete_booklist = tk.Button(self.frame_booklist_buttons, text="Delete Booklist")
@@ -158,11 +159,20 @@ class ABS:
         self.button_delete_book = tk.Button(self.frame_books_buttons, text="Delete Book", command=self.button_delete_book_clicked)
         self.button_delete_book.grid(row=0, column=2, sticky="e", padx=5)
 
-    def listbox_booklists_selection_changed(self, selected_item: tuple[int]):
-        if not selected_item:
+    def get_selected_booklist_name(self) -> str | None:
+        selected_items = self.listbox_booklists.curselection()
+
+        if not selected_items:
+            return None
+        
+        return self.listbox_booklists.get(selected_items[0])
+
+
+    def listbox_booklists_selection_changed(self):   
+        selected_booklist_name = self.get_selected_booklist_name()
+        if selected_booklist_name is None:
             return
         
-        selected_booklist_name = self.listbox_booklists.get(selected_item[0])
         selected_booklist = self.bookshelf.booklists[selected_booklist_name]
         self.selected_booklist = selected_booklist
         self.repopulate_books()
@@ -221,9 +231,36 @@ class ABS:
         
         selected_item = selected_items[0]
         return int(self.treeview_books.item(selected_item)["text"])
+    
+    def button_new_booklist_clicked(self):
+        name_window = NameBooklistWindow(self.root)
+        self.root.wait_window(name_window)
+
+        if name_window.confirmed:
+            try:
+                self.bookshelf.new_booklist(name_window.new_name)
+            except ValueError:
+                msgbox.showerror("Unable to Create Booklist", f"The booklist \"{name_window.new_name}\" already exists.")
+
+        self.repopulate_bookslists()
 
     def button_rename_booklist_clicked(self):
-        pass
+        if not self.selected_booklist.is_user_created:
+            msgbox.showerror("Cannot Rename Booklist", "You cannot rename this booklist.")
+            return
+
+        selected_booklist_name = self.selected_booklist.name
+        
+        rename_window = NameBooklistWindow(self.root, selected_booklist_name)
+        self.root.wait_window(rename_window)
+
+        if rename_window.confirmed:
+            try:
+                self.bookshelf.rename_booklist(selected_booklist_name, rename_window.new_name)
+            except ValueError:
+                msgbox.showerror("Unable to Rename Booklist", f"The booklist \"{rename_window.new_name}\" already exists.")
+
+        self.repopulate_bookslists()
 
     def button_new_book_clicked(self):
         book = Book("", "", 0, *self.bookshelf.custom_properties)

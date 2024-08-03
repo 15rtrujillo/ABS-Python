@@ -58,10 +58,10 @@ class EditBookWindow(tk.Toplevel):
         self.frame_buttons.columnconfigure(0, weight=1)
         self.frame_buttons.columnconfigure(1, weight=1)
 
-        self.button_confirm = tk.Button(self.frame_buttons, text="Confirm", command=self.confirm)
+        self.button_confirm = tk.Button(self.frame_buttons, text="Confirm", command=self.button_confirm_clicked)
         self.button_confirm.grid(row=0, column=0, sticky="ew", padx=5)
 
-        self.bind("<Return>", lambda _: self.confirm())
+        self.bind("<Return>", lambda _: self.button_confirm_clicked())
 
         self.button_cancel = tk.Button(self.frame_buttons, text="Cancel", command=self.destroy)
         self.button_cancel.grid(row=0, column=1, sticky="ew", padx=5)
@@ -106,7 +106,7 @@ class EditBookWindow(tk.Toplevel):
 
             self.checkbutton_booklist_dict[booklist.name] = selected
                     
-    def confirm(self):
+    def button_confirm_clicked(self):
         self.confirmed = True
 
         self.book.title = self.entry_properties_dict["Title"].get()
