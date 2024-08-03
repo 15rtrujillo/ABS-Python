@@ -158,4 +158,8 @@ class Bookshelf:
         self.booklists[new_name] = new_booklist
 
         # Save booklists
+
+    def delete_booklist(self, booklist: Booklist):
+        del self.booklists[booklist.name]
         
+        # Save booklists

@@ -98,7 +98,7 @@ class ABS:
         self.button_rename_booklist = tk.Button(self.frame_booklist_buttons, text="Rename Booklist", command=self.button_rename_booklist_clicked)
         self.button_rename_booklist.grid(row=0, column=1, padx=5, sticky="ew")
         
-        self.button_delete_booklist = tk.Button(self.frame_booklist_buttons, text="Delete Booklist")
+        self.button_delete_booklist = tk.Button(self.frame_booklist_buttons, text="Delete Booklist", command=self.button_delete_booklist_clicked)
         self.button_delete_booklist.grid(row=0, column=2, padx=5, sticky="ew")
         
     def __create_books_frame(self):
@@ -259,6 +259,19 @@ class ABS:
                 self.bookshelf.rename_booklist(selected_booklist_name, rename_window.new_name)
             except ValueError:
                 msgbox.showerror("Unable to Rename Booklist", f"The booklist \"{rename_window.new_name}\" already exists.")
+
+        self.repopulate_bookslists()
+
+    def button_delete_booklist_clicked(self):
+        booklist = self.selected_booklist
+        if not booklist.is_user_created:
+            msgbox.showerror("Cannot Delete Booklist", "You cannot delete this booklist.")
+            return
+        
+        result = msgbox.askyesno("Delete Booklist", f"Are you sure you want to delete \"{booklist.name}\"?")
+
+        if result:
+            self.bookshelf.delete_booklist(booklist)
 
         self.repopulate_bookslists()
 
