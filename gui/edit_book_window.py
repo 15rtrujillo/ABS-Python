@@ -1,6 +1,6 @@
 from book import Book
 from bookshelf import Bookshelf
-from scrollable_frame import ScrollableFrame
+from gui.widgets.scrollable_frame import ScrollableFrame
 
 
 import tkinter as tk
@@ -19,6 +19,7 @@ class EditBookWindow(tk.Toplevel):
             self.title("Edit Book")
 
         self.grab_set()
+        self.focus_set()
 
         self.rowconfigure(0, weight=5)
         self.rowconfigure(1, weight=40)

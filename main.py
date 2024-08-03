@@ -1,4 +1,4 @@
-import abs
+import gui.abs as abs
 import bookshelf
 
 

@@ -1,10 +1,10 @@
-from about_window import AboutWindow
+from gui.about_window import AboutWindow
 from book import Book
 from booklist import Booklist
 from bookshelf import Bookshelf
-from edit_book_window import EditBookWindow
-from name_booklist_window import NameBooklistWindow
-from scrollable_treeview import ScrollableTreeview
+from gui.edit_book_window import EditBookWindow
+from gui.name_booklist_window import NameBooklistWindow
+from gui.widgets.scrollable_treeview import ScrollableTreeview
 
 
 import copy

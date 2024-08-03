@@ -11,6 +11,7 @@ class NameBooklistWindow(tk.Toplevel):
         self.confirmed = False
 
         self.grab_set()
+        self.focus_set()
 
         self.rowconfigure(0, weight=33)
         self.rowconfigure(1, weight=33)
