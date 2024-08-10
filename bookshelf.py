@@ -34,6 +34,7 @@ class Bookshelf:
             if id > self.max_book_id:
                 self.max_book_id = id
 
+            # The following line creates a list from the dictionary keys
             custom_properties = [*book["custom_properties"]]
             if not self.custom_properties:
                 self.custom_properties = custom_properties
@@ -45,9 +46,10 @@ class Bookshelf:
                 book["title"],
                 book["author"],
                 book["publication_year"],
-                *custom_properties
+                custom_properties
             )
             new_book.id = id
+            # The following line passes in the dictionary/JSON object as kwargs
             new_book.define_custom_property(**book["custom_properties"])
 
             self.books[id] = new_book
@@ -70,7 +72,7 @@ class Bookshelf:
                 print("Couldn't parse JSON for booklist", file_name)
                 continue
 
-            new_booklist = Booklist(list_json["name"], True, *list_json["books"])
+            new_booklist = Booklist(list_json["name"], True, list_json["books"])
  
             self.booklists[list_json["name"]] = new_booklist
 
@@ -98,7 +100,7 @@ class Bookshelf:
         
         self.__load_books()
 
-        all_books = Booklist("All Books", False, *self.books.keys())
+        all_books = Booklist("All Books", False, [*self.books.keys()])
         self.booklists[all_books.name] = all_books
 
         self.__load_booklists()

@@ -2,7 +2,7 @@ import json
 
 
 class Book:
-    def __init__(self, title: str, author: str, publication_year: str, *custom_properties: str):
+    def __init__(self, title: str, author: str, publication_year: str, custom_properties: list[str]):
         self.id = -1
         self.title = title
         self.author = author

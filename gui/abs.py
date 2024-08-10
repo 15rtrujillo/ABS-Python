@@ -280,7 +280,7 @@ class ABS:
         self.repopulate_bookslists()
 
     def button_new_book_clicked(self):
-        book = Book("", "", 0, *self.bookshelf.custom_properties)
+        book = Book("", "", 0, self.bookshelf.custom_properties)
 
         edit_book_window = EditBookWindow(self.root, book, self.bookshelf)
         self.root.wait_window(edit_book_window)
