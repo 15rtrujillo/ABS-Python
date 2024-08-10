@@ -317,5 +317,4 @@ class ABS:
 
         if result:
             self.bookshelf.delete_book(selected_book)
-
-        self.repopulate_books()
+            self.repopulate_books()
