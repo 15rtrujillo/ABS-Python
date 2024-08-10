@@ -24,3 +24,11 @@ class ScrollableListbox(tk.Frame):
 
         for item in items:
             self.listbox.insert(tk.END, item)
+
+    def get_selected_item(self) -> str | None:
+        selected_items = self.listbox.curselection()
+
+        if not selected_items:
+            return None
+        
+        return self.listbox.get(selected_items[0])

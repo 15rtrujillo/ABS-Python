@@ -162,7 +162,7 @@ class Bookshelf:
 
     def new_booklist(self, name: str):
         # Check if the new name already exists
-        if name in self.booklists.keys():
+        if name.casefold() in [n.casefold() for n in self.booklists.keys()]:
             raise ValueError()
         
         new_booklist = Booklist(name, True)
@@ -172,7 +172,7 @@ class Bookshelf:
 
     def rename_booklist(self, old_name: str, new_name: str):
         # Check if the new name already exists
-        if new_name in self.booklists.keys():
+        if new_name.casefold() in [n.casefold() for n in self.booklists.keys()]:
             raise ValueError()
         
         old_booklist = self.booklists[old_name]

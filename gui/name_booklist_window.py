@@ -23,7 +23,7 @@ class NameBooklistWindow(tk.Toplevel):
 
         if self.old_name is None:
             self.title("New Booklist")
-            self.label_instructions.configure(text="Please enter a name for the new booklist")            
+            self.label_instructions.configure(text="Please enter a name for the new booklist")
         else:
             self.title("Rename Booklist")
             self.label_instructions.configure(text="Please enter a new name for booklist currently titled \"" + self.old_name + "\"")
@@ -49,7 +49,8 @@ class NameBooklistWindow(tk.Toplevel):
     def button_confirm_clicked(self):
         new_name = self.entry_new_name.get()
         if new_name == "":
-            msgbox.showerror("Enter a Name", "Please enter a name in the text box.")
+            msgbox.showinfo("Enter a Name", "Please enter a name in the text box.")
+            return
         
         self.confirmed = True
         self.new_name = new_name

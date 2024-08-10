@@ -162,17 +162,8 @@ class ABS:
         self.button_delete_book = tk.Button(self.frame_books_buttons, text="Delete Book", command=self.button_delete_book_clicked)
         self.button_delete_book.grid(row=0, column=2, sticky="e", padx=5)
 
-    def get_selected_booklist_name(self) -> str | None:
-        selected_items = self.listbox_booklists.curselection()
-
-        if not selected_items:
-            return None
-        
-        return self.listbox_booklists.get(selected_items[0])
-
-
     def listbox_booklists_selection_changed(self):   
-        selected_booklist_name = self.get_selected_booklist_name()
+        selected_booklist_name = self.scrollable_listbox_booklists.get_selected_item()
         if selected_booklist_name is None:
             return
         
@@ -230,7 +221,7 @@ class ABS:
     def get_selected_book_id(self, message: str) -> int:
         selected_items = self.treeview_books.selection()
         if not selected_items:
-            msgbox.showerror("Select a Book", "Please select a book to " + message + ".")
+            msgbox.showinfo("Select a Book", "Please select a book to " + message + ".")
             return -1
         
         selected_item = selected_items[0]
