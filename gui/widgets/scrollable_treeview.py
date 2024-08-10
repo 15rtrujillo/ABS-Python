@@ -22,3 +22,21 @@ class ScrollableTreeview(tk.Frame):
         self.treeview.grid(row=0, column=0, sticky="nsew")
         self.vscroll.grid(row=0, column=1, sticky="ns")
         self.hscroll.grid(row=1, column=0, sticky="ew")
+
+    def configure_columns(self, columns: list[str]):
+        self.treeview.configure(columns=columns)
+        for column in columns:
+            self.treeview.heading(column, text=column)
+            self.treeview.column(column, width=150, stretch=True)
+
+    def populate_items(self, texts: list[str], values: list[list[str]]):
+        """Clears all itmes in the treeview and repopulates them"""
+        for item in self.treeview.get_children():
+            self.treeview.delete(item)
+
+        for i in range (len(texts)):
+            self.treeview.insert("", "end",
+                                 text=texts[i],
+                                 values=values[i])
+
+        

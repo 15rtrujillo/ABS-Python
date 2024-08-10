@@ -194,20 +194,19 @@ class ABS:
             self.listbox_booklists.insert(tk.END, booklist.name)
 
     def repopulate_books(self):
-        for item in self.treeview_books.get_children():
-            self.treeview_books.delete(item)
-
+        texts: list[str] = []
+        values: list[list[str]] = []
         for book_id in self.selected_booklist.books:
             book = self.bookshelf.books[book_id]
-            self.treeview_books.insert("", "end",
-                                       text=str(book_id),
-                                       values=([book.title, book.author, book.publication_year] + [*book.custom_properties.values()]))
+            texts.append(book.id)
+
+            book_values = [book.title, book.author, book.publication_year] + [*book.custom_properties.values()]
+            values.append(book_values)
+
+        self.scrollable_treeview_books.populate_items(texts, values)
     
     def reconfigure_treeview_columns(self, columns: list[str]):
-        self.treeview_books.configure(columns=columns)
-        for column in columns:
-            self.treeview_books.heading(column, text=column)
-            self.treeview_books.column(column, width=150, stretch=True)
+        self.scrollable_treeview_books.configure_columns(columns)
 
     def reconfigure_filters(self, filters: list[str]):
         menu: tk.Menu = self.options_search["menu"]
