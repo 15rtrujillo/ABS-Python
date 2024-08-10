@@ -4,6 +4,7 @@ from booklist import Booklist
 from bookshelf import Bookshelf
 from gui.edit_book_window import EditBookWindow
 from gui.name_booklist_window import NameBooklistWindow
+from gui.widgets.scrollable_listbox import ScrollableListbox
 from gui.widgets.scrollable_treeview import ScrollableTreeview
 
 
@@ -79,9 +80,11 @@ class ABS:
         self.label_booklist_frame_title = tk.Label(self.frame_booklists, text="Booklists")
         self.label_booklist_frame_title.grid(row=0, column=0)
         
-        self.listbox_booklists = tk.Listbox(self.frame_booklists)
+        self.scrollable_listbox_booklists = ScrollableListbox(self.frame_booklists)
+        self.scrollable_listbox_booklists.grid(row=1, column=0, sticky="nsew", padx=5)
+
+        self.listbox_booklists = self.scrollable_listbox_booklists.listbox
         self.listbox_booklists.bind("<<ListboxSelect>>", lambda _: self.listbox_booklists_selection_changed())
-        self.listbox_booklists.grid(row=1, column=0, sticky="nsew", padx=5)
 
         # Booklist buttons frame
         self.frame_booklist_buttons = tk.Frame(self.frame_booklists)
@@ -185,13 +188,15 @@ class ABS:
             self.button_delete_book.configure(text="Delete Book", command=self.button_delete_book_clicked)
 
     def repopulate_bookslists(self):
-        self.listbox_booklists.delete(0, tk.END)
+        booklists: list[str] = []
 
-        self.listbox_booklists.insert(tk.END, "All Books")
+        booklists.append("All Books")
         for booklist in self.bookshelf.booklists.values():
             if not booklist.is_user_created:
                 continue
-            self.listbox_booklists.insert(tk.END, booklist.name)
+            booklists.append(booklist.name)
+
+        self.scrollable_listbox_booklists.populate_items(booklists)
 
     def repopulate_books(self):
         texts: list[str] = []
