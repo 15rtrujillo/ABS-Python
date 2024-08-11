@@ -3,7 +3,7 @@ import tkinter.messagebox as msgbox
 
 
 class NewPropertyWindow(tk.Toplevel):
-    def __init__(self, master: tk.Tk):
+    def __init__(self, master: tk.Misc):
         super().__init__(master)
 
         self.property_name = ""

@@ -2,7 +2,7 @@ import tkinter as tk
 
 
 class AboutWindow(tk.Toplevel):
-    def __init__(self, master: tk.Tk):
+    def __init__(self, master: tk.Misc):
         super().__init__(master)
 
         self.title("About")

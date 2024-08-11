@@ -1,7 +1,6 @@
-# Release
-# from gui.widgets.scrollable_listbox import ScrollableListbox
-# Testing
-from widgets.scrollable_listbox import ScrollableListbox
+from gui.new_property_window import NewPropertyWindow
+from gui.widgets.scrollable_listbox import ScrollableListbox
+from typing import Callable
 
 
 import tkinter as tk
@@ -9,13 +8,16 @@ import tkinter.messagebox as msgbox
 
 
 class PropertiesWindow(tk.Toplevel):
-    def __init__(self, master: tk.Tk, custom_properties: list[str]):
+    def __init__(self, master: tk.Misc, custom_properties: list[str],
+                 func_new_property: Callable[[str, str], None],
+                 func_delete_property: Callable[[str], None]):
         super().__init__(master)
 
         self.custom_properties = custom_properties
-        self.change_made = False
+        self.func_new_property = func_new_property
+        self.func_delete_property = func_delete_property
 
-        self.title("Configure Book Properties")
+        self.title("Edit Book Properties")
 
         self.grab_set()
         self.focus_set()
@@ -49,7 +51,7 @@ Removing a property will remove the value for ALL books and cannot be undone."""
         self.frame_properties_buttons.columnconfigure(0, weight=50)
         self.frame_properties_buttons.columnconfigure(1, weight=50)
 
-        self.button_new_property = tk.Button(self.frame_properties_buttons, text="New Property")
+        self.button_new_property = tk.Button(self.frame_properties_buttons, text="New Property", command=self.button_new_property_clicked)
         self.button_new_property.grid(row=0, column=0, sticky="e", padx=5)
 
         self.button_delete_property = tk.Button(self.frame_properties_buttons, text="Delete Property", command=self.button_delete_property_clicked)
@@ -57,6 +59,20 @@ Removing a property will remove the value for ALL books and cannot be undone."""
 
         self.button_close = tk.Button(self, text="Close", command=self.destroy)
         self.button_close.grid(row=4, column=0)
+
+    def button_new_property_clicked(self):
+        new_property_window = NewPropertyWindow(self)
+        self.wait_window(new_property_window)
+
+        if new_property_window.confirmed:
+            new_property_name = new_property_window.property_name
+            if new_property_name.casefold() in [p.casefold() for p in self.custom_properties]:
+                msgbox.showinfo("Property Exists", f"The property \"{new_property_name}\" already exists.")
+                return
+            
+            self.custom_properties.append(new_property_name)
+            self.scrollable_listbox.populate_items(self.custom_properties)
+            self.func_new_property(new_property_name, new_property_window.default_value)
 
     def button_delete_property_clicked(self):
         selection = self.scrollable_listbox.get_selected_item()
@@ -73,6 +89,7 @@ You CANNOT undo this action.""")
         if result:
             self.custom_properties.remove(selection)
             self.scrollable_listbox.populate_items(self.custom_properties)
+            self.func_delete_property(selection)
 
 
 if __name__ == "__main__":

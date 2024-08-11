@@ -162,6 +162,9 @@ class ABS:
         self.button_delete_book = tk.Button(self.frame_books_buttons, text="Delete Book", command=self.button_delete_book_clicked)
         self.button_delete_book.grid(row=0, column=2, sticky="e", padx=5)
 
+    def show_window(self):
+        self.root.mainloop()
+
     def listbox_booklists_selection_changed(self):   
         selected_booklist_name = self.scrollable_listbox_booklists.get_selected_item()
         if selected_booklist_name is None:
@@ -215,9 +218,6 @@ class ABS:
         self.reconfigure_treeview_columns(all_properties)
         self.reconfigure_filters(all_properties)
 
-    def show_window(self):
-        self.root.mainloop()
-
     def get_selected_book_id(self, message: str) -> int:
         selected_items = self.treeview_books.selection()
         if not selected_items:
@@ -234,10 +234,9 @@ class ABS:
         if name_window.confirmed:
             try:
                 self.bookshelf.new_booklist(name_window.new_name)
+                self.repopulate_bookslists()
             except ValueError:
                 msgbox.showerror("Unable to Create Booklist", f"The booklist \"{name_window.new_name}\" already exists.")
-
-        self.repopulate_bookslists()
 
     def button_rename_booklist_clicked(self):
         if not self.selected_booklist.is_user_created:
@@ -252,10 +251,9 @@ class ABS:
         if rename_window.confirmed:
             try:
                 self.bookshelf.rename_booklist(selected_booklist_name, rename_window.new_name)
+                self.repopulate_bookslists()
             except ValueError:
                 msgbox.showerror("Unable to Rename Booklist", f"The booklist \"{rename_window.new_name}\" already exists.")
-
-        self.repopulate_bookslists()
 
     def button_delete_booklist_clicked(self):
         booklist = self.selected_booklist
@@ -267,8 +265,7 @@ class ABS:
 
         if result:
             self.bookshelf.delete_booklist(booklist)
-
-        self.repopulate_bookslists()
+            self.repopulate_bookslists()
 
     def button_new_book_clicked(self):
         book = Book("", "", 0, self.bookshelf.custom_properties)
@@ -283,8 +280,7 @@ class ABS:
                     selected_booklists.append(name)
 
             self.bookshelf.add_book(edit_book_window.book, selected_booklists)
-
-        self.repopulate_books()
+            self.repopulate_books()
 
     def button_edit_book_clicked(self):
         selected_book_id = self.get_selected_book_id("edit")
@@ -303,8 +299,7 @@ class ABS:
                     selected_booklists.append(name)
 
             self.bookshelf.update_book(edit_book_window.book, selected_booklists)
-
-        self.repopulate_books()
+            self.repopulate_books()
 
     def button_delete_book_clicked(self):
         selected_book_id = self.get_selected_book_id("delete")

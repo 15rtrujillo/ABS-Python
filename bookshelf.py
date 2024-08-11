@@ -165,7 +165,7 @@ class Bookshelf:
         if name.casefold() in [n.casefold() for n in self.booklists.keys()]:
             raise ValueError()
         
-        new_booklist = Booklist(name, True)
+        new_booklist = Booklist(name, True, [])
         self.booklists[name] = new_booklist
 
         self.__save_booklists()
