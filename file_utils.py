@@ -11,6 +11,7 @@ def get_file_path(file_name: str) -> str:
 
 
 def get_data_directory() -> str:
+    """Get an absolute path to the /Data directory"""
     return get_file_path("Data")
 
 
@@ -21,10 +22,12 @@ def get_files_in_directory(directory: str) -> list[str]:
 
 
 def delete_file(file_path: str):
+    """Wrapper for os.remove(path)"""
     os.remove(file_path)
 
 
 def data_directory_exists() -> bool:
+    """Determine if the /Data directory exists"""
     return os.path.exists(get_data_directory())
 
 
