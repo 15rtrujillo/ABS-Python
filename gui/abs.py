@@ -4,6 +4,7 @@ from booklist import Booklist
 from bookshelf import Bookshelf
 from gui.edit_book_window import EditBookWindow
 from gui.name_booklist_window import NameBooklistWindow
+from gui.properties_window import PropertiesWindow
 from gui.widgets.scrollable_listbox import ScrollableListbox
 from gui.widgets.scrollable_treeview import ScrollableTreeview
 
@@ -52,19 +53,19 @@ class ABS:
         self.menu_bar = tk.Menu(self.root)
 
         # File menu
-        self.file_menu = tk.Menu(self.menu_bar, tearoff=0)
-        self.file_menu.add_command(label="Open Bookshelf File Location")
-        self.menu_bar.add_cascade(label="File", menu=self.file_menu)
+        self.menu_file = tk.Menu(self.menu_bar, tearoff=0)
+        self.menu_file.add_command(label="Open Bookshelf File Location")
+        self.menu_bar.add_cascade(label="File", menu=self.menu_file)
 
         # Edit menu
-        self.edit_menu = tk.Menu(self.menu_bar, tearoff=0)
-        self.edit_menu.add_command(label="Edit Book Properties")
-        self.menu_bar.add_cascade(label="Edit", menu=self.edit_menu)
+        self.menu_edit = tk.Menu(self.menu_bar, tearoff=0)
+        self.menu_edit.add_command(label="Edit Book Properties", command=self.menu_edit_book_properties_clicked)
+        self.menu_bar.add_cascade(label="Edit", menu=self.menu_edit)
 
         # Help Menu
-        self.help_menu = tk.Menu(self.menu_bar, tearoff=0)
-        self.help_menu.add_command(label="About", command=lambda: AboutWindow(self.root))
-        self.menu_bar.add_cascade(label="Help", menu=self.help_menu)
+        self.menu_help = tk.Menu(self.menu_bar, tearoff=0)
+        self.menu_help.add_command(label="About", command=lambda: AboutWindow(self.root))
+        self.menu_bar.add_cascade(label="Help", menu=self.menu_help)
 
         self.root.config(menu=self.menu_bar)
 
@@ -226,6 +227,15 @@ class ABS:
         
         selected_item = selected_items[0]
         return int(self.treeview_books.item(selected_item)["text"])
+
+    def menu_edit_book_properties_clicked(self):
+        custom_properties = copy.deepcopy(self.bookshelf.custom_properties)
+
+        window = PropertiesWindow(self.root, custom_properties, self.bookshelf.new_property, self.bookshelf.delete_property)
+        self.root.wait_window(window)
+
+        self.update_properties()
+        self.repopulate_books()
     
     def button_new_booklist_clicked(self):
         name_window = NameBooklistWindow(self.root)

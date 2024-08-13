@@ -213,3 +213,22 @@ class Bookshelf:
         del self.booklists[booklist.name]
         
         self.__save_booklists()
+
+    def new_property(self, name: str, default: str):
+        """Add a new property to all books.
+        The property should have already been checked to see if it's a duplicate."""
+        self.custom_properties.append(name)
+
+        for book in self.books.values():
+            book.custom_properties[name] = default
+
+        self.__save_books()
+
+    def delete_property(self, name: str):
+        """Deletes a property from all books"""
+        self.custom_properties.remove(name)
+
+        for book in self.books.values():
+            del book.custom_properties[name]
+
+        self.__save_books()
