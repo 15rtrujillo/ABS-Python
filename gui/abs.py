@@ -15,26 +15,25 @@ import tkinter.messagebox as msgbox
 import tkinter.ttk as ttk
 
 
-class ABS:
+class ABS(tk.Tk):
     def __init__(self, bookshelf: Bookshelf):
         self.bookshelf = bookshelf
         self.selected_booklist: Booklist = bookshelf.booklists["All Books"]
 
-        self.root = tk.Tk()
-        self.root.title("Aurora's Bookshelf")
-        self.root.geometry("1200x600")
+        self.title("Aurora's Bookshelf")
+        self.geometry("1200x600")
 
         self.__create_menu_bar()
         
-        self.root.rowconfigure(0, weight=1)
-        self.root.columnconfigure(0, weight=22)
-        self.root.columnconfigure(1, weight=5)
-        self.root.columnconfigure(2, weight=73)
+        self.rowconfigure(0, weight=1)
+        self.columnconfigure(0, weight=22)
+        self.columnconfigure(1, weight=5)
+        self.columnconfigure(2, weight=73)
 
         self.__create_booklist_frame()
 
         # Vertical separator
-        self.separator = ttk.Separator(self.root, orient="vertical")
+        self.separator = ttk.Separator(self, orient="vertical")
         self.separator.grid(row=0, column=1)
 
         self.__create_books_frame()
@@ -50,7 +49,7 @@ class ABS:
         self.repopulate_books()
 
     def __create_menu_bar(self):
-        self.menu_bar = tk.Menu(self.root)
+        self.menu_bar = tk.Menu(self)
 
         # File menu
         self.menu_file = tk.Menu(self.menu_bar, tearoff=0)
@@ -64,13 +63,13 @@ class ABS:
 
         # Help Menu
         self.menu_help = tk.Menu(self.menu_bar, tearoff=0)
-        self.menu_help.add_command(label="About", command=lambda: AboutWindow(self.root))
+        self.menu_help.add_command(label="About", command=lambda: AboutWindow(self))
         self.menu_bar.add_cascade(label="Help", menu=self.menu_help)
 
-        self.root.config(menu=self.menu_bar)
+        self.config(menu=self.menu_bar)
 
     def __create_booklist_frame(self):
-        self.frame_booklists = tk.Frame(self.root)
+        self.frame_booklists = tk.Frame(self)
         self.frame_booklists.grid(row=0, column=0, sticky="nsew")
 
         self.frame_booklists.rowconfigure(0, weight=5)
@@ -106,7 +105,7 @@ class ABS:
         self.button_delete_booklist.grid(row=0, column=2, padx=5, sticky="ew")
         
     def __create_books_frame(self):
-        self.frame_books = tk.Frame(self.root)
+        self.frame_books = tk.Frame(self)
         self.frame_books.grid(row=0, column=2, sticky="nsew")
 
         self.frame_books.rowconfigure(0, weight=10)
@@ -164,7 +163,7 @@ class ABS:
         self.button_delete_book.grid(row=0, column=2, sticky="e", padx=5)
 
     def show_window(self):
-        self.root.mainloop()
+        self.mainloop()
 
     def listbox_booklists_selection_changed(self):   
         selected_booklist_name = self.scrollable_listbox_booklists.get_selected_item()
@@ -231,15 +230,15 @@ class ABS:
     def menu_edit_book_properties_clicked(self):
         custom_properties = copy.deepcopy(self.bookshelf.custom_properties)
 
-        window = PropertiesWindow(self.root, custom_properties, self.bookshelf.new_property, self.bookshelf.delete_property)
-        self.root.wait_window(window)
+        window = PropertiesWindow(self, custom_properties, self.bookshelf.new_property, self.bookshelf.delete_property)
+        self.wait_window(window)
 
         self.update_properties()
         self.repopulate_books()
     
     def button_new_booklist_clicked(self):
-        name_window = NameBooklistWindow(self.root)
-        self.root.wait_window(name_window)
+        name_window = NameBooklistWindow(self)
+        self.wait_window(name_window)
 
         if name_window.confirmed:
             try:
@@ -255,8 +254,8 @@ class ABS:
 
         selected_booklist_name = self.selected_booklist.name
         
-        rename_window = NameBooklistWindow(self.root, selected_booklist_name)
-        self.root.wait_window(rename_window)
+        rename_window = NameBooklistWindow(self, selected_booklist_name)
+        self.wait_window(rename_window)
 
         if rename_window.confirmed:
             try:
@@ -280,8 +279,8 @@ class ABS:
     def button_new_book_clicked(self):
         book = Book("", "", 0, self.bookshelf.custom_properties)
 
-        edit_book_window = EditBookWindow(self.root, book, self.bookshelf)
-        self.root.wait_window(edit_book_window)
+        edit_book_window = EditBookWindow(self, book, self.bookshelf)
+        self.wait_window(edit_book_window)
 
         if edit_book_window.confirmed:
             selected_booklists: list[str] = []
@@ -299,8 +298,8 @@ class ABS:
         
         book = copy.deepcopy(self.bookshelf.books[selected_book_id])
         
-        edit_book_window = EditBookWindow(self.root, book, self.bookshelf)
-        self.root.wait_window(edit_book_window)
+        edit_book_window = EditBookWindow(self, book, self.bookshelf)
+        self.wait_window(edit_book_window)
 
         if edit_book_window.confirmed:
             selected_booklists: list[str] = []
