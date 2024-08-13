@@ -17,6 +17,7 @@ import tkinter.ttk as ttk
 
 class ABS(tk.Tk):
     def __init__(self, bookshelf: Bookshelf):
+        super().__init__()
         self.bookshelf = bookshelf
         self.selected_booklist: Booklist = bookshelf.booklists["All Books"]
 

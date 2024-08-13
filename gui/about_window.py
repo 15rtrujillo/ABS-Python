@@ -7,6 +7,8 @@ class AboutWindow(tk.Toplevel):
 
         self.title("About")
 
+        self.focus_set()
+
         self.rowconfigure(0, weight=35)
         self.rowconfigure(1, weight=35)
         self.rowconfigure(2, weight=30)
