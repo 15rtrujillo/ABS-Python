@@ -219,14 +219,6 @@ class ABS(tk.Tk):
         self.reconfigure_treeview_columns(all_properties)
         self.reconfigure_filters(all_properties)
 
-    def get_selected_book_id(self, message: str) -> int:
-        selected_text = self.scrollable_treeview_books.get_selected_text()
-        if selected_text is None:
-            msgbox.showinfo("Select a Book", "Please select a book to " + message + ".")
-            return -1
-        
-        return int(selected_text)
-
     def menu_edit_book_properties_clicked(self):
         custom_properties = copy.deepcopy(self.bookshelf.custom_properties)
 
@@ -292,10 +284,12 @@ class ABS(tk.Tk):
             self.repopulate_books()
 
     def button_edit_book_clicked(self):
-        selected_book_id = self.get_selected_book_id("edit")
-        if selected_book_id == -1:
+        selected_book = self.scrollable_treeview_books.get_selected_text()
+        if selected_book is None:
+            msgbox.showinfo("Please Select a Book", "Please select a book to edit.")
             return
         
+        selected_book_id = int(selected_book)
         book = copy.deepcopy(self.bookshelf.books[selected_book_id])
         
         edit_book_window = EditBookWindow(self, book, self.bookshelf)
@@ -311,14 +305,26 @@ class ABS(tk.Tk):
             self.repopulate_books()
 
     def button_delete_book_clicked(self):
-        selected_book_id = self.get_selected_book_id("delete")
-        if selected_book_id == -1:
+        selected_books = self.scrollable_treeview_books.get_multiple_selection_text()
+        if selected_books is None:
+            msgbox.showinfo("Please Select a Book", "Please select a book to delete.\nHint: You can hold \"Ctrl\" while clicking to select multiple books at once.")
             return
         
-        selected_book = self.bookshelf.books[selected_book_id]
-        
-        result = msgbox.askyesno("Delete Book", "Are you sure you wish to pernamently delete \"" + selected_book.title + "\"?")
+        if len(selected_books) > 1:
+            result = msgbox.askyesno("Delete Book", "Are you sure you wish to delete " + str(len(selected_books)) + " books?")
+        elif len(selected_books) == 1:
+            selected_book = self.bookshelf.books[int(selected_books[0])]
+            result = msgbox.askyesno("Delete Book", "Are you sure you wish to pernamently delete \"" + selected_book.title + "\"?")
+        else:
+            msgbox.showerror("No Books Selected", "Attempting to delete books with none selected. Please report this bug.")
+            return
 
         if result:
-            self.bookshelf.delete_book(selected_book)
+            for text in selected_books:
+                try:
+                    selected_book_id = int(text)
+                    selected_book = self.bookshelf.books[selected_book_id]
+                    self.bookshelf.delete_book(selected_book)
+                except:
+                    msgbox.showerror("Int Conversion Failed", f"Error getting the selected book. \"text\" is \"{text}\". Please report this bug.")
             self.repopulate_books()
