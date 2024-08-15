@@ -38,5 +38,20 @@ class ScrollableTreeview(tk.Frame):
             self.treeview.insert("", "end",
                                  text=texts[i],
                                  values=values[i])
-
+            
+    def get_multiple_selection_text(self) -> list[str] | None:
+        selected_items = self.treeview.selection()
+        if not selected_items:
+            return None
         
+        texts: list[str] = []
+        for selected_item in selected_items:
+            texts.append(self.treeview.item(selected_item)["text"])
+        return texts
+
+    def get_selected_text(self) -> str | None:
+        selected_texts = self.get_multiple_selection_text()
+        if selected_texts is None:
+            return None
+        
+        return selected_texts[0]

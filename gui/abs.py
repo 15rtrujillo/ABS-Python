@@ -220,13 +220,12 @@ class ABS(tk.Tk):
         self.reconfigure_filters(all_properties)
 
     def get_selected_book_id(self, message: str) -> int:
-        selected_items = self.treeview_books.selection()
-        if not selected_items:
+        selected_text = self.scrollable_treeview_books.get_selected_text()
+        if selected_text is None:
             msgbox.showinfo("Select a Book", "Please select a book to " + message + ".")
             return -1
         
-        selected_item = selected_items[0]
-        return int(self.treeview_books.item(selected_item)["text"])
+        return int(selected_text)
 
     def menu_edit_book_properties_clicked(self):
         custom_properties = copy.deepcopy(self.bookshelf.custom_properties)
