@@ -246,21 +246,11 @@ class ABS(tk.Tk):
             self.repopulate_bookslists()
 
     def button_search_clicked(self):
-        search_filter = self.search.to_filter.get()
-        search_term = self.search.entry_search.get()
         current_booklist = self.selected_booklist
         current_books = self.bookshelf.get_books_from_booklist(current_booklist)
 
         try:
-            if search_filter in self.search.default_options:
-                # If the search filter is one of the built-in properties, we need to search the __dict__
-                if search_filter == "Title" or search_filter == "Author":
-                    search_filter = search_filter.lower()
-                elif search_filter == "Publication Year":
-                    search_filter = "publication_year"
-                found_book_ids = [book.id for book in current_books if search_term.casefold() in book.__dict__[search_filter].casefold()]
-            else:
-                found_book_ids = [book.id for book in current_books if search_term.casefold() in book.custom_properties[search_filter].casefold()]
+            found_book_ids = self.search.filter_books(current_books)
         except Exception as e:
             msgbox.showerror("Error Searching", "There was an error while searching. Please report this bug.\n" + repr(e))
 

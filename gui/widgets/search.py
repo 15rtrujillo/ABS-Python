@@ -1,3 +1,6 @@
+from book import Book
+
+
 import tkinter as tk
 
 
@@ -33,3 +36,19 @@ class Search(tk.Frame):
         menu.delete(0, "end")
         for search_filter in filters:
             menu.add_command(label=search_filter, command=tk._setit(self.to_filter, search_filter))
+    
+    def filter_books(self, books: list[Book]) -> list[int]:
+        search_filter = self.to_filter.get()
+        search_term = self.entry_search.get()
+
+        if search_filter in self.default_options:
+            # If the search filter is one of the built-in properties, we need to search the __dict__
+            if search_filter == "Title" or search_filter == "Author":
+                search_filter = search_filter.lower()
+            elif search_filter == "Publication Year":
+                search_filter = "publication_year"
+            found_book_ids = [book.id for book in books if search_term.casefold() in book.__dict__[search_filter].casefold()]
+        else:
+            found_book_ids = [book.id for book in books if search_term.casefold() in book.custom_properties[search_filter].casefold()]
+
+        return found_book_ids
