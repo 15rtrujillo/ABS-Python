@@ -7,6 +7,7 @@ from gui.name_booklist_window import NameBooklistWindow
 from gui.properties_window import PropertiesWindow
 from gui.widgets.scrollable_listbox import ScrollableListbox
 from gui.widgets.scrollable_treeview import ScrollableTreeview
+from gui.widgets.search import Search
 
 
 import copy
@@ -115,8 +116,9 @@ class ABS(tk.Tk):
         self.frame_books.columnconfigure(0, weight=1)
 
         # Search frame
-        self.frame_search = tk.Frame(self.frame_books)
-        self.frame_search.grid(row=0, column=0, sticky="nsew")
+        self.search = Search(self.frame_books)
+        self.search.grid(row=0, column=0, sticky="nsew")
+        self.search.button_search.configure(command=self.button_search_clicked)
 
         # Books Treeview
         self.scrollable_treeview_books = ScrollableTreeview(self.frame_books)
@@ -137,7 +139,7 @@ class ABS(tk.Tk):
         self.button_new_book.grid(row=0, column=0, sticky="e", padx=5)
         self.button_edit_book = tk.Button(self.frame_books_buttons, text="Edit Book", command=self.button_edit_book_clicked)
         self.button_edit_book.grid(row=0, column=1, sticky="e", padx=5)
-        self.button_delete_book = tk.Button(self.frame_books_buttons, text="Delete Book", command=self.button_delete_book_clicked)
+        self.button_delete_book = tk.Button(self.frame_books_buttons, text="Delete Book(s)", command=self.button_delete_book_clicked)
         self.button_delete_book.grid(row=0, column=2, sticky="e", padx=5)
 
     def show_window(self):
@@ -150,6 +152,7 @@ class ABS(tk.Tk):
         
         selected_booklist = self.bookshelf.booklists[selected_booklist_name]
         self.selected_booklist = selected_booklist
+
         self.repopulate_books()
 
         if selected_booklist.is_user_created:
@@ -157,7 +160,7 @@ class ABS(tk.Tk):
             self.button_delete_book.configure(text="Remove Book(s)")
         else:
             self.button_new_book.configure(text="New Book", command=self.button_new_book_clicked)
-            self.button_delete_book.configure(text="Delete Book", command=self.button_delete_book_clicked)
+            self.button_delete_book.configure(text="Delete Book(s)", command=self.button_delete_book_clicked)
 
     def repopulate_bookslists(self):
         booklists: list[str] = []
@@ -186,10 +189,7 @@ class ABS(tk.Tk):
         self.scrollable_treeview_books.configure_columns(columns)
 
     def reconfigure_filters(self, filters: list[str]):
-        menu: tk.Menu = self.options_search["menu"]
-        menu.delete(0, "end")
-        for filter in filters:
-            menu.add_command(label=filter, command=tk._setit(self.to_filter, filter))
+        self.search.configure_filters(filters)
 
     def update_properties(self):
         all_properties = self.bookshelf.built_in_properties + self.bookshelf.custom_properties
@@ -245,6 +245,30 @@ class ABS(tk.Tk):
             self.bookshelf.delete_booklist(booklist)
             self.repopulate_bookslists()
 
+    def button_search_clicked(self):
+        search_filter = self.search.to_filter.get()
+        search_term = self.search.entry_search.get()
+        current_booklist = self.selected_booklist
+        current_books = self.bookshelf.get_books_from_booklist(current_booklist)
+
+        try:
+            if search_filter in self.search.default_options:
+                # If the search filter is one of the built-in properties, we need to search the __dict__
+                if search_filter == "Title" or search_filter == "Author":
+                    search_filter = search_filter.lower()
+                elif search_filter == "Publication Year":
+                    search_filter = "publication_year"
+                found_book_ids = [book.id for book in current_books if search_term.casefold() in book.__dict__[search_filter].casefold()]
+            else:
+                found_book_ids = [book.id for book in current_books if search_term.casefold() in book.custom_properties[search_filter].casefold()]
+        except Exception as e:
+            msgbox.showerror("Error Searching", "There was an error while searching. Please report this bug.\n" + repr(e))
+
+        temp_booklist = Booklist("temp_booklist", False, found_book_ids)
+        self.selected_booklist = temp_booklist
+        self.repopulate_books()
+        self.selected_booklist = current_booklist
+
     def button_new_book_clicked(self):
         book = Book("", "", 0, self.bookshelf.custom_properties)
 
@@ -291,7 +315,7 @@ class ABS(tk.Tk):
             result = msgbox.askyesno("Delete Book", "Are you sure you wish to delete " + str(len(selected_books)) + " books?")
         elif len(selected_books) == 1:
             selected_book = self.bookshelf.books[int(selected_books[0])]
-            result = msgbox.askyesno("Delete Book", "Are you sure you wish to pernamently delete \"" + selected_book.title + "\"?")
+            result = msgbox.askyesno("Delete Book", "Are you sure you wish to pernamently delete \"" + selected_book.title + "\"?\nHint: You can hold \"Ctrl\" while clicking to select multiple books at once.")
         else:
             msgbox.showerror("No Books Selected", "Attempting to delete books with none selected. Please report this bug.")
             return

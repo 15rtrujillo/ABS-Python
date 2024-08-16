@@ -122,6 +122,14 @@ class Bookshelf:
         self.__save_booklists()
         self.__save_books()
 
+    def get_books_from_booklist(self, booklist: Booklist | None = None, booklist_name: str | None = None) -> list[Book]:
+        if booklist is None and booklist_name is None:
+            raise TypeError("booklist and booklist_name cannot both be None")
+        elif booklist is None:
+            booklist = self.booklists[booklist_name]
+            
+        return [self.books[b_id] for b_id in booklist.books]
+
     def add_book(self, book: Book, booklists: list[str] | None = None):
         """Create a new book, give it an ID, and add it to the specified booklists if any were given.
         Save the book to file."""

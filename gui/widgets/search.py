@@ -20,10 +20,16 @@ class Search(tk.Frame):
         self.to_filter = tk.StringVar(self)
         self.to_filter.set("Title")
 
-        options = ["TItle", "Author", "Publication Year"]
+        self.default_options = ["Title", "Author", "Publication Year"]
 
-        self.options_search = tk.OptionMenu(self, self.to_filter, *options)
+        self.options_search = tk.OptionMenu(self, self.to_filter, *self.default_options)
         self.options_search.grid(row=0, column=2, sticky="ew")
 
         self.button_search = tk.Button(self, text="Search")
         self.button_search.grid(row=0, column=3, sticky="ew")
+
+    def configure_filters(self, filters: list[str]):
+        menu: tk.Menu = self.options_search["menu"]
+        menu.delete(0, "end")
+        for search_filter in filters:
+            menu.add_command(label=search_filter, command=tk._setit(self.to_filter, search_filter))
