@@ -117,7 +117,7 @@ class ABS(tk.Tk):
         self.frame_books.columnconfigure(0, weight=1)
 
         # Search frame
-        self.search = Search(self.frame_books)
+        self.search = Search(self.frame_books, self.bookshelf.built_in_properties)
         self.search.grid(row=0, column=0, sticky="nsew")
         self.search.button_search.configure(command=self.button_search_clicked)
 
