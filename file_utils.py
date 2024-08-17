@@ -1,4 +1,6 @@
+import datetime
 import os
+import shutil
 
 
 script_path = os.path.dirname(os.path.abspath(__file__))
@@ -34,3 +36,7 @@ def data_directory_exists() -> bool:
 def create_data_directory():
     """Creates the ABS directory at the program location"""
     os.mkdir(get_data_directory())
+
+def create_backup_file():
+    backup_filename = datetime.datetime.now().strftime("%m-%d-%Y %H-%M-%S") + ".absb"
+    shutil.copyfile(get_file_path("Data/Bookshelf.abs"), get_file_path(f"Data/{backup_filename}"))

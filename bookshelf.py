@@ -122,6 +122,26 @@ class Bookshelf:
         self.__save_booklists()
         self.__save_books()
 
+    def backup(self):
+        # Data directory should always exist by now, since load is called first.
+        backups_to_keep = 5
+
+        # Check if Bookshelf.abs exists
+        if not file_utils.os.path.exists(file_utils.get_file_path("Data/Bookshelf.abs")):
+            print("Bookshelf.abs does not exist. Unable to backup")
+            return
+        
+        files_in_directory = file_utils.get_files_in_directory(file_utils.get_data_directory())
+
+        backup_files = [file for file in files_in_directory if ".absb" in file]
+
+        if len(backup_files) >= backups_to_keep:
+            # This should delete the oldest file
+            file_utils.delete_file(file_utils.get_file_path(f"Data/{backup_files[0]}"))
+
+        # Create a new backup
+        file_utils.create_backup_file()
+
     def get_books_from_booklist(self, booklist: Booklist | None = None, booklist_name: str | None = None) -> list[Book]:
         if booklist is None and booklist_name is None:
             raise TypeError("booklist and booklist_name cannot both be None")
