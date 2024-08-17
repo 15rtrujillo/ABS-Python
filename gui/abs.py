@@ -56,7 +56,7 @@ class ABS(tk.Tk):
 
         # File menu
         self.menu_file = tk.Menu(self.menu_bar, tearoff=0)
-        self.menu_file.add_command(label="Open Bookshelf File Location")
+        self.menu_file.add_command(label="Open Bookshelf File Location", command=self.menu_open_file_location_clicked)
         self.menu_bar.add_cascade(label="File", menu=self.menu_file)
 
         # Edit menu
@@ -196,6 +196,15 @@ class ABS(tk.Tk):
         all_properties = self.bookshelf.built_in_properties + self.bookshelf.custom_properties
         self.reconfigure_treeview_columns(all_properties)
         self.reconfigure_filters(all_properties)
+
+    def menu_open_file_location_clicked(self):
+        import file_utils
+        import os
+        if os.name == "nt":
+            import subprocess
+            subprocess.Popen(f"explorer {file_utils.get_data_directory()}")
+        else:
+            msgbox.showinfo("Windows Only", f"This feature is only available on Windows systems. You can manually naviagte to \"{file_utils.get_data_directory()}\" to find the Bookshelf files.")
 
     def menu_edit_book_properties_clicked(self):
         custom_properties = copy.deepcopy(self.bookshelf.custom_properties)
