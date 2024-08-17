@@ -2,6 +2,7 @@ from gui.about_window import AboutWindow
 from book import Book
 from booklist import Booklist
 from bookshelf import Bookshelf
+from gui.add_books_booklist_window import AddBooksBooklistWindow
 from gui.edit_book_window import EditBookWindow
 from gui.name_booklist_window import NameBooklistWindow
 from gui.properties_window import PropertiesWindow
@@ -156,7 +157,7 @@ class ABS(tk.Tk):
         self.repopulate_books()
 
         if selected_booklist.is_user_created:
-            self.button_new_book.configure(text="Add Book(s)")
+            self.button_new_book.configure(text="Add Book(s)", command=self.add_books_clicked)
             self.button_delete_book.configure(text="Remove Book(s)")
         else:
             self.button_new_book.configure(text="New Book", command=self.button_new_book_clicked)
@@ -246,6 +247,10 @@ class ABS(tk.Tk):
             self.repopulate_bookslists()
 
     def button_search_clicked(self):
+        # If the search bar is empty, just reload the current booklist
+        if not self.search.entry_search.get():
+            self.repopulate_books()
+
         current_booklist = self.selected_booklist
         current_books = self.bookshelf.get_books_from_booklist(current_booklist)
 
@@ -273,6 +278,10 @@ class ABS(tk.Tk):
 
             self.bookshelf.add_book(edit_book_window.book, selected_booklists)
             self.repopulate_books()
+
+    def add_books_clicked(self):
+        books = [book for book in self.bookshelf.books.values() if book.id not in self.selected_booklist.books]
+        window = AddBooksBooklistWindow(self, self.selected_booklist.name, books)
 
     def button_edit_book_clicked(self):
         selected_book = self.scrollable_treeview_books.get_selected_text()
