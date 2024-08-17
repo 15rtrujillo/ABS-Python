@@ -37,7 +37,7 @@ class Search(tk.Frame):
         for search_filter in filters:
             menu.add_command(label=search_filter, command=tk._setit(self.to_filter, search_filter))
     
-    def filter_books(self, books: list[Book]) -> list[int]:
+    def filter_books(self, books: list[Book]) -> list[Book]:
         search_filter = self.to_filter.get()
         search_term = self.entry_search.get()
 
@@ -45,9 +45,9 @@ class Search(tk.Frame):
             # If the search filter is one of the built-in properties, we need to search the __dict__
             search_filter = search_filter.lower()
             search_filter = search_filter.replace(" ", "_")
-            
-            found_book_ids = [book.id for book in books if search_term.casefold() in book.__dict__[search_filter].casefold()]
-        else:
-            found_book_ids = [book.id for book in books if search_term.casefold() in book.custom_properties[search_filter].casefold()]
 
-        return found_book_ids
+            found_books = [book for book in books if search_term.casefold() in book.__dict__[search_filter].casefold()]
+        else:
+            found_books = [book for book in books if search_term.casefold() in book.custom_properties[search_filter].casefold()]
+
+        return found_books

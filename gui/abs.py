@@ -177,8 +177,7 @@ class ABS(tk.Tk):
     def repopulate_books(self):
         texts: list[str] = []
         values: list[list[str]] = []
-        for book_id in self.selected_booklist.books:
-            book = self.bookshelf.books[book_id]
+        for book in self.selected_booklist.books:
             texts.append(book.id)
 
             book_values = [book.title, book.author, book.publication_year] + [*book.custom_properties.values()]
@@ -261,14 +260,13 @@ class ABS(tk.Tk):
             self.repopulate_books()
 
         current_booklist = self.selected_booklist
-        current_books = self.bookshelf.get_books_from_booklist(current_booklist)
 
         try:
-            found_book_ids = self.search.filter_books(current_books)
+            found_books = self.search.filter_books(current_booklist.books)
         except Exception as e:
             msgbox.showerror("Error Searching", "There was an error while searching. Please report this bug.\n" + repr(e))
 
-        temp_booklist = Booklist("temp_booklist", False, found_book_ids)
+        temp_booklist = Booklist("temp_booklist", False, found_books)
         self.selected_booklist = temp_booklist
         self.repopulate_books()
         self.selected_booklist = current_booklist
