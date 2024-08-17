@@ -1,6 +1,6 @@
 import datetime
 import os
-import shutil
+import zipfile
 
 
 script_path = os.path.dirname(os.path.abspath(__file__))
@@ -38,5 +38,11 @@ def create_data_directory():
     os.mkdir(get_data_directory())
 
 def create_backup_file():
-    backup_filename = datetime.datetime.now().strftime("%m-%d-%Y %H-%M-%S") + ".absb"
-    shutil.copyfile(get_file_path("Data/Bookshelf.abs"), get_file_path(f"Data/{backup_filename}"))
+    backup_filename = datetime.datetime.now().strftime("%m-%d-%Y %H-%M-%S") + ".backup"
+    file_path = get_file_path("Data/" + backup_filename)
+
+    files = [file for file in get_files_in_directory(get_data_directory()) if file == "Bookshelf.abs" or ".list" in file]
+
+    with zipfile.ZipFile(file_path, "w") as zip_file:
+        for file in files:
+            zip_file.write(get_file_path("Data/" + file), file)

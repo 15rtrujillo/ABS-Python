@@ -133,7 +133,7 @@ class Bookshelf:
         
         files_in_directory = file_utils.get_files_in_directory(file_utils.get_data_directory())
 
-        backup_files = [file for file in files_in_directory if ".absb" in file]
+        backup_files = [file for file in files_in_directory if ".backup" in file]
 
         if len(backup_files) >= backups_to_keep:
             # This should delete the oldest file
