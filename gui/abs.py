@@ -22,6 +22,7 @@ class ABS(tk.Tk):
         super().__init__()
         self.bookshelf = bookshelf
         self.selected_booklist: Booklist = bookshelf.booklists["All Books"]
+        self.sort_by = self.bookshelf.built_in_properties[0]
 
         self.title("Aurora's Bookshelf")
         self.geometry("1200x600")
@@ -281,8 +282,20 @@ class ABS(tk.Tk):
 
     def button_add_books_clicked(self):
         # FINISHME
-        books = [book for book in self.bookshelf.books.values() if book.id not in self.selected_booklist.books]
-        window = AddBooksBooklistWindow(self, self.selected_booklist.name, books)
+        books = [book for book in self.bookshelf.books.values() if not self.selected_booklist.has_book(book.id)]
+        if len(books) == 0:
+            msgbox.showinfo("No Books to Add", "There are no books that can be added to this booklist.")
+            return
+        
+        window = AddBooksBooklistWindow(self, self.selected_booklist.name, books, self.bookshelf.built_in_properties)
+
+        self.wait_window(window)
+
+        if window.confirmed:
+            for book_id in window.books_to_add:
+                self.selected_booklist.books.append(self.bookshelf.books[book_id])
+            self.bookshelf.save()
+            self.repopulate_books()
 
     def button_edit_book_clicked(self):
         selected_book = self.scrollable_treeview_books.get_selected_text()

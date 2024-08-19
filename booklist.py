@@ -13,6 +13,12 @@ class Booklist:
                 return book
         return None
     
+    def has_book(self, id: int) -> bool:
+        for book in self.books:
+            if id == book.id:
+                return True
+        return False
+    
     def remove_book_by_id(self, id: int):
         for book in self.books:
             if id == book.id:

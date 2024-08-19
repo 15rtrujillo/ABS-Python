@@ -4,16 +4,17 @@ from gui.widgets.search import Search
 
 
 import tkinter as tk
+import tkinter.messagebox as msgbox
 
 
 class AddBooksBooklistWindow(tk.Toplevel):
-    def __init__(self, master: tk.Tk, booklist_name: str, books: list[Book]):
+    def __init__(self, master: tk.Tk, booklist_name: str, books: list[Book], default_properties: list[str]):
         super().__init__(master)
 
         self.booklist_name = booklist_name
         self.books = books
         self.search_results = books
-        self.books_to_add: list[Book] = []
+        self.books_to_add: list[int] = []
         self.confirmed = False
 
         self.title("Add Books")
@@ -31,7 +32,7 @@ class AddBooksBooklistWindow(tk.Toplevel):
         self.label_instructions = tk.Label(self, text=f"Select the books you would like to add to \"{self.booklist_name}\".\nHint: You can hold \"Ctrl\" while clicking to select multiple books at once.")
         self.label_instructions.grid(row=0, column=0, sticky="ew")
 
-        self.search = Search(self)
+        self.search = Search(self, default_properties)
         self.search.button_search.configure(command=self.button_search_clicked)
         self.search.grid(row=1, column=0)
 
@@ -66,7 +67,31 @@ class AddBooksBooklistWindow(tk.Toplevel):
         self.scrollable_treeview.populate_items(texts, values)
 
     def button_search_clicked(self):
-        pass
+        # If the search bar is empty, just reload the current booklist
+        if not self.search.entry_search.get():
+            self.search_results = self.books
+            self.repopulate_books()
+            return
+        
+        try:
+            self.search_results = self.search.filter_books(self.books)
+            self.repopulate_books()
+        except Exception as e:
+            msgbox.showerror("Error Searching", "There was an error while searching. Please report this bug.\n" + repr(e))
 
     def button_confirm_clicked(self):
-        pass
+        selected_items = self.scrollable_treeview.get_multiple_selection_text()
+
+        if not selected_items:
+            msgbox.showinfo("Select Books", f"You must select one or more books to add to the booklist \"{self.booklist_name}\".")
+            return
+        
+        for item in selected_items:
+            try:
+                book_id = int(item)
+                self.books_to_add.append(book_id)
+            except ValueError:
+                msgbox.showerror("Cannot Get Book ID", f"Cannot get the ID for treeview item {item}. Please report this bug.")
+
+        self.confirmed = True
+        self.destroy()
