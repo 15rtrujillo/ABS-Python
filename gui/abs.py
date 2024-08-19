@@ -157,22 +157,14 @@ class ABS(tk.Tk):
         self.repopulate_books()
 
         if selected_booklist.is_user_created:
-            self.button_new_book.configure(text="Add Book(s)", command=self.add_books_clicked)
+            self.button_new_book.configure(text="Add Book(s)", command=self.button_add_books_clicked)
             self.button_delete_book.configure(text="Remove Book(s)")
         else:
             self.button_new_book.configure(text="New Book", command=self.button_new_book_clicked)
             self.button_delete_book.configure(text="Delete Book(s)", command=self.button_delete_book_clicked)
 
     def repopulate_bookslists(self):
-        booklists: list[str] = []
-
-        booklists.append("All Books")
-        for booklist in self.bookshelf.booklists.values():
-            if not booklist.is_user_created:
-                continue
-            booklists.append(booklist.name)
-
-        self.scrollable_listbox_booklists.populate_items(booklists)
+        self.scrollable_listbox_booklists.populate_items([*self.bookshelf.booklists])
 
     def repopulate_books(self):
         texts: list[str] = []
@@ -258,6 +250,7 @@ class ABS(tk.Tk):
         # If the search bar is empty, just reload the current booklist
         if not self.search.entry_search.get():
             self.repopulate_books()
+            return
 
         current_booklist = self.selected_booklist
 
@@ -266,13 +259,13 @@ class ABS(tk.Tk):
         except Exception as e:
             msgbox.showerror("Error Searching", "There was an error while searching. Please report this bug.\n" + repr(e))
 
-        temp_booklist = Booklist("temp_booklist", False, found_books)
+        temp_booklist = Booklist("search_results", False, found_books)
         self.selected_booklist = temp_booklist
         self.repopulate_books()
         self.selected_booklist = current_booklist
 
     def button_new_book_clicked(self):
-        book = Book("", "", 0, self.bookshelf.custom_properties)
+        book = Book("", "", "", self.bookshelf.custom_properties)
 
         edit_book_window = EditBookWindow(self, book, self.bookshelf)
         self.wait_window(edit_book_window)
@@ -286,7 +279,8 @@ class ABS(tk.Tk):
             self.bookshelf.add_book(edit_book_window.book, selected_booklists)
             self.repopulate_books()
 
-    def add_books_clicked(self):
+    def button_add_books_clicked(self):
+        # FINISHME
         books = [book for book in self.bookshelf.books.values() if book.id not in self.selected_booklist.books]
         window = AddBooksBooklistWindow(self, self.selected_booklist.name, books)
 

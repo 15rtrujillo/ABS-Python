@@ -168,11 +168,9 @@ class Bookshelf:
         Also adds it to the specified booklists and removes it from booklists not specified."""
         # Replace the book with the new one
         self.books[book.id] = book
+        include_in_booklists.append("All Books")
 
         for booklist_name, booklist in self.booklists.items():
-            if not booklist.is_user_created:
-                continue
-
             # Remove the old book if it already exists in the booklist.
             booklist.remove_book_by_id(book.id)
 
@@ -208,9 +206,7 @@ class Bookshelf:
         if new_name.casefold() in [n.casefold() for n in self.booklists.keys()]:
             raise ValueError()
         
-        old_booklist = self.booklists[old_name]
-        new_booklist = copy.deepcopy(old_booklist)
-        new_booklist.name = new_name
+        booklist = self.booklists[old_name]
 
         del self.booklists[old_name]
 
@@ -218,7 +214,8 @@ class Bookshelf:
         old_file_name = "Data/" + old_name + ".list"
         file_utils.delete_file(file_utils.get_file_path(old_file_name))
 
-        self.booklists[new_name] = new_booklist
+        booklist.name = new_name
+        self.booklists[new_name] = booklist
 
         self.__save_booklists()
 

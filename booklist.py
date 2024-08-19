@@ -1,9 +1,6 @@
 from book import Book
 
 
-import json
-
-
 class Booklist:
     def __init__(self, name: str, is_user_created: bool, books: list[Book]):
         self.name = name

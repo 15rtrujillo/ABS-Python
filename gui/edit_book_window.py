@@ -4,16 +4,17 @@ from gui.widgets.scrollable_frame import ScrollableFrame
 
 
 import tkinter as tk
+import tkinter.messagebox as msgbox
 
 
 class EditBookWindow(tk.Toplevel):
-    def __init__(self, main_window: tk.Tk, book: Book, bookshelf: Bookshelf):
+    def __init__(self, main_window: tk.Tk, book: Book, bookshelf: Bookshelf, new_book: bool = False):
         super().__init__(main_window)
         self.book: Book = book
         self.bookshelf = bookshelf
         self.confirmed = False
         
-        if not book.title:
+        if new_book:
             self.title("New Book")
         else:
             self.title("Edit Book")
@@ -68,7 +69,7 @@ class EditBookWindow(tk.Toplevel):
         self.button_cancel.grid(row=0, column=1, sticky="ew", padx=5)
 
     def __populate_properties(self):
-        properties = ["Title", "Author", "Publication Year"] + [*self.book.custom_properties]
+        properties = self.bookshelf.built_in_properties + [*self.book.custom_properties]
         for i in range(len(properties)):
             property = properties[i]
 
@@ -80,15 +81,13 @@ class EditBookWindow(tk.Toplevel):
 
             self.entry_properties_dict[property] = entry
 
-            if self.book.title:
-                if property == "Title":
-                    entry.insert(0, self.book.title)
-                elif property == "Author":
-                    entry.insert(0, self.book.author)
-                elif property == "Publication Year":
-                    entry.insert(0, self.book.publication_year)
-                else:
-                    entry.insert(0, self.book.custom_properties[property])
+            if property in self.bookshelf.built_in_properties:
+                key = property.lower().replace(" ", "_")
+                entry.insert(0, self.book.__dict__[key])
+            elif property in self.bookshelf.custom_properties:
+                entry.insert(0, self.book.custom_properties[property])
+            else:
+                msgbox.showerror("Unknown Property", f"Unknown property \"{property}\". Please report this bug.")
 
     def __populate_booklists(self):
         i = 0
@@ -96,7 +95,7 @@ class EditBookWindow(tk.Toplevel):
             if not booklist.is_user_created:
                 continue
 
-            if self.book.id in booklist.books:
+            if booklist.get_book_by_id(self.book.id):
                 selected = tk.IntVar(self, 1)
             else:
                 selected = tk.IntVar(self, 0)
@@ -110,9 +109,10 @@ class EditBookWindow(tk.Toplevel):
     def button_confirm_clicked(self):
         self.confirmed = True
 
-        self.book.title = self.entry_properties_dict["Title"].get()
-        self.book.author = self.entry_properties_dict["Author"].get()
-        self.book.publication_year = self.entry_properties_dict["Publication Year"].get()
+        for property in self.bookshelf.built_in_properties:
+            key = property.lower().replace(" ", "_")
+            self.book.__dict__[key] = self.entry_properties_dict[property].get()
+        
         for property in self.book.custom_properties.keys():
             self.book.custom_properties[property] = self.entry_properties_dict[property].get()
 
@@ -120,7 +120,7 @@ class EditBookWindow(tk.Toplevel):
 
 
 if __name__ == "__main__":
-    my_book = Book("My Princess", "Ryan", 1995, "Price", "Location")
+    my_book = Book("My Princess", "Ryan", "1995", "Price", "Location")
     root = tk.Tk()
     root.bind("<Visibility>", lambda _: EditBookWindow(root, my_book, None))
     tk.mainloop()
