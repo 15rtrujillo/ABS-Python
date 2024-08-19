@@ -75,7 +75,11 @@ class Bookshelf:
                 print("Couldn't parse JSON for booklist", file_name)
                 continue
 
-            new_booklist = Booklist(list_json["name"], True, list_json["books"])
+            books: list[Book] = []
+            for book_id in list_json["books"]:
+                books.append(self.books[book_id])
+
+            new_booklist = Booklist(list_json["name"], True, books)
  
             self.booklists[list_json["name"]] = new_booklist
 
@@ -95,7 +99,7 @@ class Bookshelf:
             file_name = booklist.name + ".list"
             file = open(file_utils.get_file_path("Data/" + file_name), "w")
             
-            json.dump(booklist, file, default=vars, indent=4)
+            json.dump(booklist, file, default=booklist.serialize, indent=4)
 
     def load(self):
         """Attempts to load books and booklists from the Data directory.
@@ -107,7 +111,7 @@ class Bookshelf:
         
         self.__load_books()
 
-        all_books = Booklist("All Books", False, [*self.books.keys()])
+        all_books = Booklist("All Books", False, [*self.books.values()])
         self.booklists[all_books.name] = all_books
 
         self.__load_booklists()
@@ -142,14 +146,6 @@ class Bookshelf:
         # Create a new backup
         file_utils.create_backup_file()
 
-    def get_books_from_booklist(self, booklist: Booklist | None = None, booklist_name: str | None = None) -> list[Book]:
-        if booklist is None and booklist_name is None:
-            raise TypeError("booklist and booklist_name cannot both be None")
-        elif booklist is None:
-            booklist = self.booklists[booklist_name]
-            
-        return [self.books[b_id] for b_id in booklist.books]
-
     def add_book(self, book: Book, booklists: list[str] | None = None):
         """Create a new book, give it an ID, and add it to the specified booklists if any were given.
         Save the book to file."""
@@ -159,43 +155,35 @@ class Bookshelf:
         book.id = book_id
 
         self.books[book_id] = book
-        self.booklists["All Books"].books.append(book_id)
+        self.booklists["All Books"].books.append(book)
 
         if booklists is not None:
             for booklist_name in booklists:
-                self.booklists[booklist_name].books.append(book_id)
+                self.booklists[booklist_name].books.append(book)
 
         self.save()
 
-    def update_book(self, book: Book, booklists: list[str] | None = None):
+    def update_book(self, book: Book, include_in_booklists: list[str] = []):
         """Replaces a book with a newer version and saves it to file.
         Also adds it to the specified booklists and removes it from booklists not specified."""
         # Replace the book with the new one
         self.books[book.id] = book
+        include_in_booklists.append("All Books")
 
-        for name, list in self.booklists.items():
-            if not list.is_user_created:
-                continue
+        for booklist_name, booklist in self.booklists.items():
+            # Remove the old book if it already exists in the booklist.
+            booklist.remove_book_by_id(book.id)
 
-            # If the current booklist is one the book should be in
-            if name in booklists:
-                # Check if it's in there. If it isn't, add it.
-                if not book.id in list.books:
-                    list.books.append(book.id)
-            else:
-                # If it shouldn't be in the booklist, remove it if it's there.
-                if book.id in list.books:
-                    list.books.remove(book.id)
+            # If this is a list we want to add the book to, add it.
+            if booklist_name in include_in_booklists:
+                booklist.books.append(book)
 
         self.save()
 
     def delete_book(self, book: Book):
         """Deletes a book from memory, all booklists, and files"""
         for booklist in self.booklists.values():
-            try:
-                booklist.books.remove(book.id)
-            except ValueError:
-                continue
+            booklist.remove_book_by_id(book.id)
         
         del self.books[book.id]
 
@@ -218,9 +206,7 @@ class Bookshelf:
         if new_name.casefold() in [n.casefold() for n in self.booklists.keys()]:
             raise ValueError()
         
-        old_booklist = self.booklists[old_name]
-        new_booklist = copy.deepcopy(old_booklist)
-        new_booklist.name = new_name
+        booklist = self.booklists[old_name]
 
         del self.booklists[old_name]
 
@@ -228,7 +214,8 @@ class Bookshelf:
         old_file_name = "Data/" + old_name + ".list"
         file_utils.delete_file(file_utils.get_file_path(old_file_name))
 
-        self.booklists[new_name] = new_booklist
+        booklist.name = new_name
+        self.booklists[new_name] = booklist
 
         self.__save_booklists()
 
