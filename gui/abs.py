@@ -267,7 +267,7 @@ class ABS(tk.Tk):
     def button_new_book_clicked(self):
         book = Book("", "", "", self.bookshelf.custom_properties)
 
-        edit_book_window = EditBookWindow(self, book, self.bookshelf)
+        edit_book_window = EditBookWindow(self, book, self.bookshelf, True)
         self.wait_window(edit_book_window)
 
         if edit_book_window.confirmed:
