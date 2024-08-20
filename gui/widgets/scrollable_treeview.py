@@ -40,6 +40,8 @@ class ScrollableTreeview(tk.Frame):
 
         if self.sort_by is not None:
             try:
+                # I convert to a string here because entries that are pure integers get converted to ints.
+                # That makes empty entries break the comparison, because they stay strings.
                 sorted_items = dict(sorted(items.items(), key=lambda i: str(i[1][self.sort_by]), reverse=self.reverse_sort))
                 items = sorted_items
             except Exception as e:
@@ -74,5 +76,8 @@ class ScrollableTreeview(tk.Frame):
             self.sort_by = column
             self.reverse_sort = False
 
+        # Grab all the items already in the treeview.
+        # We're creating a dictionary from the text: values
+        # Where text is the book's id and values is a list of the properties
         items = {self.treeview.item(item)["text"]: self.treeview.item(item)["values"] for item in self.treeview.get_children()}
         self.populate_items(items)
