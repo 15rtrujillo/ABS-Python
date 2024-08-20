@@ -69,7 +69,7 @@ class EditBookWindow(tk.Toplevel):
         self.button_cancel.grid(row=0, column=1, sticky="ew", padx=5)
 
     def __populate_properties(self):
-        properties = self.bookshelf.built_in_properties + [*self.book.custom_properties]
+        properties = self.bookshelf.built_in_properties_display + [*self.book.custom_properties]
         for i in range(len(properties)):
             property = properties[i]
 
@@ -81,7 +81,7 @@ class EditBookWindow(tk.Toplevel):
 
             self.entry_properties_dict[property] = entry
 
-            if property in self.bookshelf.built_in_properties:
+            if property in self.bookshelf.built_in_properties_display:
                 key = property.lower().replace(" ", "_")
                 entry.insert(0, self.book.__dict__[key])
             elif property in self.bookshelf.custom_properties:
@@ -109,7 +109,7 @@ class EditBookWindow(tk.Toplevel):
     def button_confirm_clicked(self):
         self.confirmed = True
 
-        for property in self.bookshelf.built_in_properties:
+        for property in self.bookshelf.built_in_properties_display:
             key = property.lower().replace(" ", "_")
             self.book.__dict__[key] = self.entry_properties_dict[property].get()
         

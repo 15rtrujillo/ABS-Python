@@ -22,7 +22,6 @@ class ABS(tk.Tk):
         super().__init__()
         self.bookshelf = bookshelf
         self.selected_booklist: Booklist = bookshelf.booklists["All Books"]
-        self.sort_by = self.bookshelf.built_in_properties[0]
 
         self.title("Aurora's Bookshelf")
         self.geometry("1200x600")
@@ -118,7 +117,7 @@ class ABS(tk.Tk):
         self.frame_books.columnconfigure(0, weight=1)
 
         # Search frame
-        self.search = Search(self.frame_books, self.bookshelf.built_in_properties)
+        self.search = Search(self.frame_books, self.bookshelf.built_in_properties_display)
         self.search.grid(row=0, column=0, sticky="nsew")
         self.search.button_search.configure(command=self.button_search_clicked)
 
@@ -168,15 +167,16 @@ class ABS(tk.Tk):
         self.scrollable_listbox_booklists.populate_items([*self.bookshelf.booklists])
 
     def repopulate_books(self):
-        texts: list[str] = []
-        values: list[list[str]] = []
+        books: dict[str, list[str]] = {}
+
         for book in self.selected_booklist.books:
-            texts.append(book.id)
+            book_values: list[str] = []
+            for property in self.bookshelf.built_in_properties:
+                book_values.append(book.__dict__[property])
+            book_values += [*book.custom_properties.values()]
+            books[str(book.id)] = book_values
 
-            book_values = [book.title, book.author, book.publication_year] + [*book.custom_properties.values()]
-            values.append(book_values)
-
-        self.scrollable_treeview_books.populate_items(texts, values)
+        self.scrollable_treeview_books.populate_items(books)
     
     def reconfigure_treeview_columns(self, columns: list[str]):
         self.scrollable_treeview_books.configure_columns(columns)
@@ -185,7 +185,7 @@ class ABS(tk.Tk):
         self.search.configure_filters(filters)
 
     def update_properties(self):
-        all_properties = self.bookshelf.built_in_properties + self.bookshelf.custom_properties
+        all_properties = self.bookshelf.built_in_properties_display + self.bookshelf.custom_properties
         self.reconfigure_treeview_columns(all_properties)
         self.reconfigure_filters(all_properties)
 
@@ -286,7 +286,7 @@ class ABS(tk.Tk):
             msgbox.showinfo("No Books to Add", "There are no books that can be added to this booklist.")
             return
         
-        window = AddBooksBooklistWindow(self, self.selected_booklist.name, books, self.bookshelf.built_in_properties)
+        window = AddBooksBooklistWindow(self, self.selected_booklist.name, books, self.bookshelf.built_in_properties_display)
 
         self.wait_window(window)
 

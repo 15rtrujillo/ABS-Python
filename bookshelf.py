@@ -13,7 +13,8 @@ class Bookshelf:
         self.books: dict[int, Book] = {}
         self.booklists: dict[str, Booklist] = {}
         self.max_book_id: int = -1
-        self.built_in_properties: list[str] = ["Title", "Author", "Publication Year"]
+        self.built_in_properties = ["title", "author", "publication_year"]
+        self.built_in_properties_display: list[str] = ["Title", "Author", "Publication Year"]
         self.custom_properties: list[str] = []
 
     def __load_books(self):

@@ -6,6 +6,9 @@ class ScrollableTreeview(tk.Frame):
     def __init__(self, master: tk.Misc):
         super().__init__(master)
 
+        self.sort_by: int | None = None
+        self.reverse_sort = False
+
         self.rowconfigure(0, weight=98)
         self.rowconfigure(1, weight=2)
         self.columnconfigure(0, weight=98)
@@ -25,19 +28,27 @@ class ScrollableTreeview(tk.Frame):
 
     def configure_columns(self, columns: list[str]):
         self.treeview.configure(columns=columns)
-        for column in columns:
-            self.treeview.heading(column, text=column)
-            self.treeview.column(column, width=150, stretch=True)
+        for i in range(len(columns)):
+            column = columns[i]
+            self.treeview.heading(column, text=column, command=lambda i=i: self.column_heading_clicked(i))
+            self.treeview.column(column, width=100, stretch=True)
 
-    def populate_items(self, texts: list[str], values: list[list[str]]):
+    def populate_items(self, items: dict[str, list[str]]):
         """Clears all itmes in the treeview and repopulates them"""
         for item in self.treeview.get_children():
             self.treeview.delete(item)
 
-        for i in range (len(texts)):
+        if self.sort_by is not None:
+            try:
+                sorted_items = dict(sorted(items.items(), key=lambda i: str(i[1][self.sort_by]), reverse=self.reverse_sort))
+                items = sorted_items
+            except Exception as e:
+                print("Error sorting: " + repr(e))
+
+        for text, values in items.items():
             self.treeview.insert("", "end",
-                                 text=texts[i],
-                                 values=values[i])
+                                 text=text,
+                                 values=values)
             
     def get_multiple_selection_text(self) -> list[str] | None:
         selected_items = self.treeview.selection()
@@ -55,3 +66,13 @@ class ScrollableTreeview(tk.Frame):
             return None
         
         return selected_texts[0]
+
+    def column_heading_clicked(self, column: int):
+        if column == self.sort_by:
+            self.reverse_sort = not self.reverse_sort
+        else:
+            self.sort_by = column
+            self.reverse_sort = False
+
+        items = {self.treeview.item(item)["text"]: self.treeview.item(item)["values"] for item in self.treeview.get_children()}
+        self.populate_items(items)

@@ -56,15 +56,19 @@ class AddBooksBooklistWindow(tk.Toplevel):
         self.repopulate_books()
 
     def repopulate_books(self):
-        texts: list[str] = []
-        values: list[list[str]] = []
+        books: dict[str, list[str]] = {}
+
         for book in self.search_results:
-            texts.append(book.id)
+            book_values: list[str] = []
 
-            book_values = [book.title, book.author, book.publication_year] + [*book.custom_properties.values()]
-            values.append(book_values)
+            default_properties = [property.lower().replace(" ", "_") for property in self.search.default_options]
 
-        self.scrollable_treeview.populate_items(texts, values)
+            for property in default_properties:
+                book_values.append(book.__dict__[property])
+            book_values += [*book.custom_properties.values()]
+            books[str(book.id)] = book_values
+
+        self.scrollable_treeview.populate_items(books)
 
     def button_search_clicked(self):
         # If the search bar is empty, just reload the current booklist
