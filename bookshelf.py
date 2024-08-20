@@ -90,7 +90,7 @@ class Bookshelf:
 
         json.dump([*self.books.values()], file, default=vars, indent=4)
 
-    def __save_booklists(self):
+    def save_booklists(self):
         """Saves all the booklists to respective .list files"""
         for booklist in self.booklists.values():
             if not booklist.is_user_created:
@@ -123,7 +123,7 @@ class Bookshelf:
             print("Data directory does not exist. Creating...")
             file_utils.create_data_directory()
 
-        self.__save_booklists()
+        self.save_booklists()
         self.__save_books()
 
     def backup(self):
@@ -198,7 +198,7 @@ class Bookshelf:
         new_booklist = Booklist(name, True, [])
         self.booklists[name] = new_booklist
 
-        self.__save_booklists()
+        self.save_booklists()
 
     def rename_booklist(self, old_name: str, new_name: str):
         """Rename a booklist and its file if one of the same name does not already exist"""
@@ -217,7 +217,7 @@ class Bookshelf:
         booklist.name = new_name
         self.booklists[new_name] = booklist
 
-        self.__save_booklists()
+        self.save_booklists()
 
     def delete_booklist(self, booklist: Booklist):
         """Delete a booklist from memory and disk"""
@@ -227,7 +227,7 @@ class Bookshelf:
         
         del self.booklists[booklist.name]
         
-        self.__save_booklists()
+        self.save_booklists()
 
     def new_property(self, name: str, default: str):
         """Add a new property to all books.
