@@ -1,36 +1,39 @@
 from model.book import Book
 from model.booklist import Booklist
+from typing import Final
 
 
-import copy
 import file_utils
 import json
 
 
 class Bookshelf:
     """Class for storing data used in the program"""
+
+    BUILT_IN_PROPERTIES: Final[list[str]] = ["_title", "_author", "_publication_year"]
+    BUILT_IN_PROPERTIES_DISPLAY: Final[list[str]] = ["Title", "Author", "Publication Year"]
+    CUSTOM_PROPERTIES: list[str] = []
+
     def __init__(self):
         self.books: dict[int, Book] = {}
         self.booklists: dict[str, Booklist] = {}
         self.max_book_id: int = -1
-        self.built_in_properties = ["title", "author", "publication_year"]
-        self.built_in_properties_display: list[str] = ["Title", "Author", "Publication Year"]
-        self.custom_properties: list[str] = []
 
-    def __load_books(self):
+    def _load_books(self):
         """Attempt to load the Bookshelf.abs file which contains information on all books."""
         # Read in the books
         try:
-            bookshelf_file = open(file_utils.get_file_path("Data/Bookshelf.abs"), "r")
+            bookshelf_file = open(file_utils.get_data_file_path("Bookshelf.abs"), "r")
         except FileNotFoundError:
             print("Bookshelf.abs file does not exist")
+            print("File will be created upon first book creation")
             return
         
         try:
             bookshelf_json = json.loads(bookshelf_file.read())
-        except json.JSONDecodeError:
-            print("Error decoding Bookshelf JSON")
-            return
+        except json.JSONDecodeError as e:
+            print("Error decoding Bookshelf JSON: " + repr(e))
+            exit()
         
         for book in bookshelf_json:
             id = book["id"]
@@ -38,11 +41,13 @@ class Bookshelf:
                 self.max_book_id = id
 
             # The following line creates a list from the dictionary keys
-            custom_properties = [*book["custom_properties"]]
-            if not self.custom_properties:
-                self.custom_properties = custom_properties
-            elif self.custom_properties != custom_properties:
+            custom_properties: list[str] = [*book["custom_properties"]]
+            if not Bookshelf.CUSTOM_PROPERTIES:
+                Bookshelf.CUSTOM_PROPERTIES = custom_properties
+            elif Bookshelf.CUSTOM_PROPERTIES != custom_properties:
                 print("Custom properties mismatch!")
+                print("Current Properties:", Bookshelf.CUSTOM_PROPERTIES)
+                print(f"Book ID {id} Properties: {str(custom_properties)}") 
                 exit()
 
             new_book = Book(
@@ -57,23 +62,23 @@ class Bookshelf:
 
             self.books[id] = new_book
 
-    def __load_booklists(self):
+    def _load_booklists(self):
         """Attempt to load all the .list files in the Data directory"""
         file_names = file_utils.get_files_in_directory(file_utils.get_data_directory())
         for file_name in file_names:
-            if file_name[file_name.find(".")+1:] != "list":
+            if not ".list" in file_name:
                 continue
 
             try:
-                list_file = open(file_utils.get_file_path("Data/" + file_name), "r")
+                list_file = open(file_utils.get_data_file_path(file_name), "r")
             except FileNotFoundError:
                 print("File not found for some reason:", file_name)
                 continue
 
             try:
                 list_json = json.loads(list_file.read())
-            except json.JSONDecodeError:
-                print("Couldn't parse JSON for booklist", file_name)
+            except json.JSONDecodeError as e:
+                print(f"Couldn't parse JSON for booklist \"{file_name}\"\n{repr(e)}")
                 continue
 
             books: list[Book] = []
@@ -84,21 +89,20 @@ class Bookshelf:
  
             self.booklists[list_json["name"]] = new_booklist
 
-    def __save_books(self):
+    def save_books(self):
         """Save all books to the Bookshelf.abs file"""
-        file_name = "Data/Bookshelf.abs"
-        file = open(file_utils.get_file_path(file_name), "w")
+        file = open(file_utils.get_data_file_path("Bookshelf.abs"), "w")
 
         json.dump([*self.books.values()], file, default=vars, indent=4)
 
     def save_booklists(self):
         """Saves all the booklists to respective .list files"""
         for booklist in self.booklists.values():
-            if not booklist.is_user_created:
+            if not booklist.IS_USER_CREATED:
                 continue
 
             file_name = booklist.name + ".list"
-            file = open(file_utils.get_file_path("Data/" + file_name), "w")
+            file = open(file_utils.get_data_file_path(file_name), "w")
             
             json.dump(booklist, file, default=booklist.serialize, indent=4)
 
@@ -110,12 +114,12 @@ class Bookshelf:
             print("Data directory does not exist. Creating...")
             file_utils.create_data_directory()
         
-        self.__load_books()
+        self._load_books()
 
         all_books = Booklist("All Books", False, [*self.books.values()])
         self.booklists[all_books.name] = all_books
 
-        self.__load_booklists()
+        self._load_booklists()
 
     def save(self):
         """Save all data: books and booklists"""
@@ -125,7 +129,7 @@ class Bookshelf:
             file_utils.create_data_directory()
 
         self.save_booklists()
-        self.__save_books()
+        self.save_books()
 
     def backup(self):
         """Create a zip file of the current contents of the Data directory.
@@ -134,8 +138,8 @@ class Bookshelf:
         backups_to_keep = 5
 
         # Check if Bookshelf.abs exists
-        if not file_utils.os.path.exists(file_utils.get_file_path("Data/Bookshelf.abs")):
-            print("Bookshelf.abs does not exist. Unable to backup")
+        if not file_utils.os.path.exists(file_utils.get_data_file_path("Bookshelf.abs")):
+            print("Bookshelf.abs does not exist. Unable to backup at this time")
             return
         
         files_in_directory = file_utils.get_files_in_directory(file_utils.get_data_directory())
@@ -144,11 +148,12 @@ class Bookshelf:
 
         if len(backup_files) >= backups_to_keep:
             # This should delete the oldest file
-            file_utils.delete_file(file_utils.get_file_path(f"Data/{backup_files[0]}"))
+            file_utils.delete_file(file_utils.get_data_file_path(backup_files[0]))
 
         # Create a new backup
         file_utils.create_backup_file()
 
+'''
     def add_book(self, book: Book, booklists: list[str] | None = None):
         """Create a new book, give it an ID, and add it to the specified booklists if any were given.
         Save the book to file."""
@@ -250,3 +255,4 @@ class Bookshelf:
             del book.custom_properties[name]
 
         self.__save_books()
+'''

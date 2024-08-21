@@ -1,10 +1,7 @@
-from typing import Callable, Final
+from typing import Callable
 
 
 class Book:
-    BUILT_IN_PROPERTIES: Final[list[str]] = ["_title", "_author", "_publication_year"]
-    BUILT_IN_PROPERTIES_DISPLAY: Final[list[str]] = ["Title", "Author", "Publication Year"]
-
     def __init__(self, title: str, author: str, publication_year: str, custom_properties: list[str]):
         self.id = -1
         self._title = title
@@ -43,9 +40,14 @@ class Book:
         self._notify_property_changed("Publication Year")
 
     def define_custom_property(self, **kwargs: str):
-        for property, value in kwargs.items():
-            self.custom_properties[property] = value
-            self._notify_property_changed(property)
+        for property_name, value in kwargs.items():
+            if self.custom_properties.get(property_name) is None:
+                self.custom_properties[property_name] = value
+                self._notify_property_changed("custom_properties")
+                self._notify_property_changed(property_name)
+            else:
+                self.custom_properties[property_name] = value
+                self._notify_property_changed(property_name)
 
     def remove_custom_property(self, key: str):
         try:

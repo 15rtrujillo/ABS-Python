@@ -26,20 +26,20 @@ class ABS(tk.Tk):
         self.title("Aurora's Bookshelf")
         self.geometry("1200x600")
 
-        self.__create_menu_bar()
+        self._create_menu_bar()
         
         self.rowconfigure(0, weight=1)
         self.columnconfigure(0, weight=22)
         self.columnconfigure(1, weight=5)
         self.columnconfigure(2, weight=73)
 
-        self.__create_booklist_frame()
+        self._create_booklist_frame()
 
         # Vertical separator
         self.separator = ttk.Separator(self, orient="vertical")
         self.separator.grid(row=0, column=1)
 
-        self.__create_books_frame()
+        self._create_books_frame()
 
         # Add booklists to the listbox and select the "All Books" list.
         self.repopulate_bookslists()
@@ -51,7 +51,7 @@ class ABS(tk.Tk):
 
         self.repopulate_books()
 
-    def __create_menu_bar(self):
+    def _create_menu_bar(self):
         self.menu_bar = tk.Menu(self)
 
         # File menu
@@ -71,7 +71,7 @@ class ABS(tk.Tk):
 
         self.config(menu=self.menu_bar)
 
-    def __create_booklist_frame(self):
+    def _create_booklist_frame(self):
         self.frame_booklists = tk.Frame(self)
         self.frame_booklists.grid(row=0, column=0, sticky="nsew")
 
@@ -107,7 +107,7 @@ class ABS(tk.Tk):
         self.button_delete_booklist = tk.Button(self.frame_booklist_buttons, text="Delete Booklist", command=self.button_delete_booklist_clicked)
         self.button_delete_booklist.grid(row=0, column=2, padx=5, sticky="ew")
         
-    def __create_books_frame(self):
+    def _create_books_frame(self):
         self.frame_books = tk.Frame(self)
         self.frame_books.grid(row=0, column=2, sticky="nsew")
 
@@ -117,7 +117,7 @@ class ABS(tk.Tk):
         self.frame_books.columnconfigure(0, weight=1)
 
         # Search frame
-        self.search = Search(self.frame_books, self.bookshelf.built_in_properties_display)
+        self.search = Search(self.frame_books)
         self.search.grid(row=0, column=0, sticky="nsew")
         self.search.button_search.configure(command=self.button_search_clicked)
 

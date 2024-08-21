@@ -5,7 +5,7 @@ import tkinter as tk
 
 
 class Search(tk.Frame):
-    def __init__(self, master: tk.Misc, default_options: list[str]):
+    def __init__(self, master: tk.Misc):
         super().__init__(master)
 
         self.default_options = default_options
