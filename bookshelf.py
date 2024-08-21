@@ -1,5 +1,5 @@
-from book import Book
-from booklist import Booklist
+from model.book import Book
+from model.booklist import Booklist
 
 
 import copy
@@ -128,6 +128,8 @@ class Bookshelf:
         self.__save_books()
 
     def backup(self):
+        """Create a zip file of the current contents of the Data directory.
+        Only keep a certain number of backups at a time."""
         # Data directory should always exist by now, since load is called first.
         backups_to_keep = 5
 

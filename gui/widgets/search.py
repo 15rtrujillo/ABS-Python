@@ -1,4 +1,4 @@
-from book import Book
+from model.book import Book
 
 
 import tkinter as tk

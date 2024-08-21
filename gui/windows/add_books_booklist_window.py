@@ -1,4 +1,4 @@
-from book import Book
+from model.book import Book
 from gui.widgets.scrollable_treeview import ScrollableTreeview
 from gui.widgets.search import Search
 

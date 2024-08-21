@@ -1,4 +1,4 @@
-from book import Book
+from model.book import Book
 from bookshelf import Bookshelf
 from gui.widgets.scrollable_frame import ScrollableFrame
 

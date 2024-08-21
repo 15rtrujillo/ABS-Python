@@ -1,14 +1,14 @@
-from gui.about_window import AboutWindow
-from book import Book
-from booklist import Booklist
 from bookshelf import Bookshelf
-from gui.add_books_booklist_window import AddBooksBooklistWindow
-from gui.edit_book_window import EditBookWindow
-from gui.name_booklist_window import NameBooklistWindow
-from gui.properties_window import PropertiesWindow
 from gui.widgets.scrollable_listbox import ScrollableListbox
 from gui.widgets.scrollable_treeview import ScrollableTreeview
 from gui.widgets.search import Search
+from gui.windows.about_window import AboutWindow
+from gui.windows.add_books_booklist_window import AddBooksBooklistWindow
+from gui.windows.edit_book_window import EditBookWindow
+from gui.windows.name_booklist_window import NameBooklistWindow
+from gui.windows.properties_window import PropertiesWindow
+from model.book import Book
+from model.booklist import Booklist
 
 
 import copy

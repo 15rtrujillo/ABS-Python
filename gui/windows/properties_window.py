@@ -1,5 +1,5 @@
-from gui.new_property_window import NewPropertyWindow
 from gui.widgets.scrollable_listbox import ScrollableListbox
+from gui.windows.new_property_window import NewPropertyWindow
 from typing import Callable
 
 

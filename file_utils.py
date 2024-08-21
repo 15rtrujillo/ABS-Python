@@ -38,6 +38,7 @@ def create_data_directory():
     os.mkdir(get_data_directory())
 
 def create_backup_file():
+    """Create a zip file with the contents of the Data directory."""
     backup_filename = datetime.datetime.now().strftime("%m-%d-%Y %H-%M-%S") + ".backup"
     file_path = get_file_path("Data/" + backup_filename)
 
