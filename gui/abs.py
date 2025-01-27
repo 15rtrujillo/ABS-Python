@@ -112,8 +112,9 @@ class ABS(tk.Tk):
         self.frame_books.grid(row=0, column=2, sticky="nsew")
 
         self.frame_books.rowconfigure(0, weight=10)
-        self.frame_books.rowconfigure(1, weight=80)
-        self.frame_books.rowconfigure(2, weight=10)
+        self.frame_books.rowconfigure(1, weight=75)
+        self.frame_books.rowconfigure(2, weight=5)
+        self.frame_books.rowconfigure(3, weight=10)
         self.frame_books.columnconfigure(0, weight=1)
 
         # Search frame
@@ -127,9 +128,12 @@ class ABS(tk.Tk):
 
         self.treeview_books = self.scrollable_treeview_books.treeview
 
+        self.label_book_count = tk.Label(self.frame_books, text="Books in List: 0")
+        self.label_book_count.grid(row=2, column=0, sticky="e", padx=10)
+
         # Books buttons frame
         self.frame_books_buttons = tk.Frame(self.frame_books)
-        self.frame_books_buttons.grid(row=2, column=0, sticky="nse")
+        self.frame_books_buttons.grid(row=3, column=0, sticky="nse")
 
         self.frame_books_buttons.rowconfigure(0, weight=1)
         self.frame_books_buttons.columnconfigure(0, weight=33)
@@ -177,6 +181,7 @@ class ABS(tk.Tk):
             books[str(book.id)] = book_values
 
         self.scrollable_treeview_books.populate_items(books)
+        self.label_book_count.configure(text=f"Books in View: {len(books)}")
     
     def reconfigure_treeview_columns(self, columns: list[str]):
         self.scrollable_treeview_books.configure_columns(columns)
