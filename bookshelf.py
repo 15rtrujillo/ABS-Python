@@ -49,6 +49,7 @@ class Bookshelf:
                 book["title"],
                 book["author"],
                 book["publication_year"],
+                book["notes"] if "notes" in book else "",
                 custom_properties
             )
             new_book.id = id
@@ -250,3 +251,6 @@ class Bookshelf:
             del book.custom_properties[name]
 
         self.__save_books()
+
+    def get_all_properties_display(self) -> list[str]:
+        return self.built_in_properties_display + self.custom_properties

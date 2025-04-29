@@ -271,7 +271,7 @@ class ABS(tk.Tk):
         self.selected_booklist = current_booklist
 
     def button_new_book_clicked(self):
-        book = Book("", "", "", self.bookshelf.custom_properties)
+        book = Book("", "", "", "", self.bookshelf.custom_properties)
 
         edit_book_window = EditBookWindow(self, book, self.bookshelf, True)
         self.wait_window(edit_book_window)

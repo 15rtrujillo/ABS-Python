@@ -1,9 +1,10 @@
 class Book:
-    def __init__(self, title: str, author: str, publication_year: str, custom_properties: list[str]):
+    def __init__(self, title: str, author: str, publication_year: str, notes: str, custom_properties: list[str]):
         self.id = -1
         self.title = title
         self.author = author
         self.publication_year = publication_year
+        self.notes = notes
         self.custom_properties: dict[str, str] = {}
         for custom_property in custom_properties:
             self.custom_properties[custom_property] = ""

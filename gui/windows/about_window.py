@@ -21,7 +21,7 @@ class AboutWindow(tk.Toplevel):
         self.label_about = tk.Label(self, text="This program was created by Ryan for his princess, Aurora.")
         self.label_about.grid(row=1, column=0)
 
-        self.label_version = tk.Label(self, text="v1.1.1")
+        self.label_version = tk.Label(self, text="v1.2.0")
         self.label_version.grid(row=2, column=0)
 
         self.button_close = tk.Button(self, text="Close", command=self.destroy)

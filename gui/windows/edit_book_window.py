@@ -10,6 +10,7 @@ import tkinter.messagebox as msgbox
 class EditBookWindow(tk.Toplevel):
     def __init__(self, main_window: tk.Tk, book: Book, bookshelf: Bookshelf, new_book: bool = False):
         super().__init__(main_window)
+        self.geometry("500x500")
         self.book: Book = book
         self.bookshelf = bookshelf
         self.confirmed = False
@@ -22,30 +23,46 @@ class EditBookWindow(tk.Toplevel):
         self.grab_set()
         self.focus_set()
 
-        self.rowconfigure(0, weight=5)
-        self.rowconfigure(1, weight=40)
-        self.rowconfigure(2, weight=5)
-        self.rowconfigure(3, weight=40)
-        self.rowconfigure(4, weight=10)
+        self.rowconfigure(0, weight=5) # Instructions
+        self.rowconfigure(1, weight=26) # Properties
+        self.rowconfigure(2, weight=26) # Notes
+        self.rowconfigure(3, weight=5) # Booklists label
+        self.rowconfigure(4, weight=26) # Booklists
+        self.rowconfigure(5, weight=10) # Buttons
         self.columnconfigure(0, weight=1)
 
         self.label_instructions = tk.Label(self, text="Please specify the following information:")
         self.label_instructions.grid(row=0, column=0, sticky="ew")
 
         self.scrollable_properties = ScrollableFrame(self)
-        self.scrollable_properties.grid(row=1, column=0, sticky="ew")
+        self.scrollable_properties.grid(row=1, column=0, sticky="nsew")
 
         self.frame_properties = self.scrollable_properties.inner_frame
 
         # Create properties
+        properties = self.bookshelf.get_all_properties_display()
         self.entry_properties_dict: dict[str, tk.Entry] = {}
-        self.__populate_properties()
+        self.__populate_properties(properties)
+
+        self.frame_notes = tk.Frame(self)
+        self.frame_notes.grid(row=2, column=0, sticky="new")
+
+        self.frame_notes.rowconfigure(0, weight=1)
+        self.frame_notes.rowconfigure(1, weight=4)
+        self.frame_notes.columnconfigure(0, weight=1)
+
+        self.label_notes = tk.Label(self.frame_notes, text="Notes:")
+        self.label_notes.grid(row=0, column=0,  sticky="w")
+
+        self.text_notes = tk.Text(self.frame_notes, height=4)
+        self.text_notes.grid(row=1, column=0, sticky="ew", padx=5)
+        self.text_notes.insert(tk.END, self.book.notes)
 
         self.label_booklists = tk.Label(self, text="Please select which booklists this book should belong to.")
-        self.label_booklists.grid(row=2, column=0, sticky="ew", padx=5)
+        self.label_booklists.grid(row=3, column=0, sticky="ew", padx=5)
 
         self.scrollable_booklists = ScrollableFrame(self)
-        self.scrollable_booklists.grid(row=3, column=0, sticky="ew")
+        self.scrollable_booklists.grid(row=4, column=0, sticky="nsew")
 
         self.frame_booklists = self.scrollable_booklists.inner_frame
 
@@ -54,7 +71,7 @@ class EditBookWindow(tk.Toplevel):
 
         # Buttons
         self.frame_buttons = tk.Frame(self)
-        self.frame_buttons.grid(row=4, column=0)
+        self.frame_buttons.grid(row=5, column=0, sticky="ns", pady=5)
 
         self.frame_buttons.rowconfigure(0, weight=1)
         self.frame_buttons.columnconfigure(0, weight=1)
@@ -68,8 +85,7 @@ class EditBookWindow(tk.Toplevel):
         self.button_cancel = tk.Button(self.frame_buttons, text="Cancel", command=self.destroy)
         self.button_cancel.grid(row=0, column=1, sticky="ew", padx=5)
 
-    def __populate_properties(self):
-        properties = self.bookshelf.built_in_properties_display + [*self.book.custom_properties]
+    def __populate_properties(self, properties: list[str]):
         for i in range(len(properties)):
             property = properties[i]
 
@@ -116,11 +132,13 @@ class EditBookWindow(tk.Toplevel):
         for property in self.book.custom_properties.keys():
             self.book.custom_properties[property] = self.entry_properties_dict[property].get()
 
+        self.book.notes = self.text_notes.get("1.0", tk.END)
+
         self.destroy()
 
 
 if __name__ == "__main__":
-    my_book = Book("My Princess", "Ryan", "1995", "Price", "Location")
+    my_book = Book("My Princess", "Ryan", "1995", "My notes", "Price", "Location")
     root = tk.Tk()
     root.bind("<Visibility>", lambda _: EditBookWindow(root, my_book, None))
     tk.mainloop()
